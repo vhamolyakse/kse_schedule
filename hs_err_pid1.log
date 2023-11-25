@@ -1,0 +1,170 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x00000000004c10d4, pid=1, tid=61
+#
+# JRE version: OpenJDK Runtime Environment 18.9 (11.0.16+8) (build 11.0.16+8)
+# Java VM: OpenJDK 64-Bit Server VM 18.9 (11.0.16+8, mixed mode, sharing, tiered, compressed oops, g1 gc, linux-aarch64)
+# Problematic frame:
+# C  [python3+0xc10d4]
+#
+# No core dump will be written. Core dumps have been disabled. To enable core dumping, try "ulimit -c unlimited" before starting Java again
+#
+# If you would like to submit a bug report, please visit:
+#   https://bugreport.java.com/bugreport/crash.jsp
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: -Dlogback.level.org.optaplanner=INFO 
+
+Host: AArch64, 4 cores, 9G, Debian GNU/Linux 11 (bullseye)
+Time: Thu Nov 23 21:19:56 2023 UTC elapsed time: 208.805428 seconds (0d 0h 3m 28s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x0000fffef831a000):  JavaThread "Thread-9" daemon [_thread_in_native, id=61, stack(0x0000ffff07000000,0x0000ffff077ff000)]
+
+Stack: [0x0000ffff07000000,0x0000ffff077ff000],  sp=0x0000ffff077fb0a0,  free space=8172k
+Native frames: (J=compiled Java code, A=aot compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  [python3+0xc10d4]
+C  [python3+0xc130c]
+C  [_jpype.cpython-39-aarch64-linux-gnu.so+0x68488]  JPPyObject::decref()+0x44
+C  [_jpype.cpython-39-aarch64-linux-gnu.so+0x684b4]  JPPyObject::~JPPyObject()+0x14
+C  [_jpype.cpython-39-aarch64-linux-gnu.so+0x69434]  JPPyErrFrame::~JPPyErrFrame()+0x34
+C  [_jpype.cpython-39-aarch64-linux-gnu.so+0x4b94c]  JPypeException::convertPythonToJava(JPContext*)+0xbc
+C  [_jpype.cpython-39-aarch64-linux-gnu.so+0x4c814]  JPypeException::toJava(JPContext*)+0x174
+C  [_jpype.cpython-39-aarch64-linux-gnu.so+0x5f650]  Java_org_jpype_proxy_JPypeProxy_hostInvoke+0x4ac
+J 4955  org.jpype.proxy.JPypeProxy.hostInvoke(JLjava/lang/String;JJ[J[Ljava/lang/Object;)Ljava/lang/Object; (0 bytes) @ 0x0000ffff6861b604 [0x0000ffff6861b540+0x00000000000000c4]
+C  0x000000076be045e0
+
+Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
+J 4955  org.jpype.proxy.JPypeProxy.hostInvoke(JLjava/lang/String;JJ[J[Ljava/lang/Object;)Ljava/lang/Object; (0 bytes) @ 0x0000ffff6861b608 [0x0000ffff6861b540+0x00000000000000c8]
+J 8172 c2 org.jpyinterpreter.user.utils.entities.Lesson$$5.$readFieldsFromCPythonReference()V (192 bytes) @ 0x0000ffff68acb67c [0x0000ffff68acb300+0x000000000000037c]
+J 8536 c2 org.jpyinterpreter.user.utils.entities.Lesson$$6.readFromPythonObject(Ljava/util/Set;Ljava/util/Map;)V (44 bytes) @ 0x0000ffff68b534ac [0x0000ffff68b532c0+0x00000000000001ec]
+j  org.jpyinterpreter.user.utils.entities.TimeTable$$6.readFromPythonObject(Ljava/util/Set;Ljava/util/Map;)V+75
+J 8167 c2 org.optaplanner.optapy.PythonPlanningSolutionCloner.cloneSolution(Ljava/lang/Object;)Ljava/lang/Object; (312 bytes) @ 0x0000ffff68ac2288 [0x0000ffff68ac0d80+0x0000000000001508]
+j  org.optaplanner.core.impl.score.director.AbstractScoreDirector.cloneSolution(Ljava/lang/Object;)Ljava/lang/Object;+16
+j  org.optaplanner.core.impl.score.director.AbstractScoreDirector.cloneWorkingSolution()Ljava/lang/Object;+5
+j  org.optaplanner.core.impl.phase.scope.AbstractStepScope.createOrGetClonedSolution()Ljava/lang/Object;+12
+J 7478 c2 org.optaplanner.core.impl.localsearch.DefaultLocalSearchPhase.doStep(Lorg/optaplanner/core/impl/localsearch/scope/LocalSearchStepScope;)V (39 bytes) @ 0x0000ffff689e4360 [0x0000ffff689e3e00+0x0000000000000560]
+J 7490 c1 org.optaplanner.core.impl.localsearch.DefaultLocalSearchPhase.solve(Lorg/optaplanner/core/impl/solver/scope/SolverScope;)V (300 bytes) @ 0x0000ffff620dcbc0 [0x0000ffff620daec0+0x0000000000001d00]
+j  org.optaplanner.core.impl.solver.AbstractSolver.runPhases(Lorg/optaplanner/core/impl/solver/scope/SolverScope;)V+96
+j  org.optaplanner.core.impl.solver.DefaultSolver.solve(Ljava/lang/Object;)Ljava/lang/Object;+138
+v  ~StubRoutines::call_stub
+
+siginfo: si_signo: 11 (SIGSEGV), si_code: 1 (SEGV_MAPERR), si_addr: 0x0000000000000000
+
+Register to memory mapping:
+
+R0=0x0000000000000000
+R1=0x0000000000000001
+R2=0x0000000000000000
+R3=0x0000ffff04c47300
+R4=0x0000000000000000
+R5=0x0000000000000001
+R6=0x0000000000000001
+R7=0x0000000000000000
+R8=0x0000000000000001
+R9=0x0000000000000000
+R10=0x0000000000000100
+R11=0x00000000000000b6
+R12=0x0000000000919000
+R13=0x0000000000000030
+R14=0x000000000003ffff
+R15=0x0000000040e330b0
+R16=0x00000000004c10b0
+R17=0x0000ffff8c21e000
+R18=0x0000000000036e70
+R19=0x0000ffff04c47450
+R20=0x0000ffff077fb1b0
+R21=0x0000ffff077fb1b8
+R22=0x0000fffef80548c0
+R23=0x0000ffff077fb310
+R24=0x0000000000000001
+R25=0x0000fffef80548a0
+R26=0x0000ffff79051300
+R27=0x0000000000000001
+R28=0x0000ffff077fb388
+R29=0x0000ffff077fb0a0
+R30=0x00000000004c130c
+
+
+Registers:
+R0 =0x0 is NULL
+R1 =0x0000000000000001 is an unknown value
+R2 =0x0 is NULL
+R3 =0x0000ffff04c47300 points into unknown readable memory: 0x0000ffff04c474e0 | e0 74 c4 04 ff ff 00 00
+R4 =0x0 is NULL
+R5 =0x0000000000000001 is an unknown value
+R6 =0x0000000000000001 is an unknown value
+R7 =0x0 is NULL
+R8 =0x0000000000000001 is an unknown value
+R9 =0x0 is NULL
+R10=0x0000000000000100 is an unknown value
+R11=0x00000000000000b6 is an unknown value
+R12=0x0000000000919000: <offset 0x0000000000519000> in /usr/bin/python3 at 0x0000000000400000
+R13=0x0000000000000030 is an unknown value
+R14=0x000000000003ffff is an unknown value
+R15=0x0000000040e330b0 points into unknown readable memory: 0x0000ffffa4abd000 | 00 d0 ab a4 ff ff 00 00
+R16=0x00000000004c10b0: <offset 0x00000000000c10b0> in /usr/bin/python3 at 0x0000000000400000
+R17=0x0000ffff8c21e000 points into unknown readable memory: 0x000000000000003f | 3f 00 00 00 00 00 00 00
+R18=0x0000000000036e70 is an unknown value
+R19=0x0000ffff04c47450 points into unknown readable memory: 0x0000000000000000 | 00 00 00 00 00 00 00 00
+R20=0x0000ffff077fb1b0 is pointing into the stack for thread: 0x0000fffef800a000
+R21=0x0000ffff077fb1b8 is pointing into the stack for thread: 0x0000fffef800a000
+R22=0x0000fffef80548c0 points into unknown readable memory: 0x0000ffff78006bb0 | b0 6b 00 78 ff ff 00 00
+R23=0x0000ffff077fb310 is pointing into the stack for thread: 0x0000fffef800a000
+R24=0x0000000000000001 is an unknown value
+R25=0x0000fffef80548a0 points into unknown readable memory: 0x474e5543432b2b00 | 00 2b 2b 43 43 55 4e 47
+R26=0x0000ffff79051300 points into unknown readable memory: 0x0000ffff8c70fbc0 | c0 fb 70 8c ff ff 00 00
+R27=0x0000000000000001 is an unknown value
+R28=0x0000ffff077fb388 is pointing into the stack for thread: 0x0000fffef800a000
+R29=0x0000ffff077fb0a0 is pointing into the stack for thread: 0x0000fffef800a000
+R30=0x00000000004c130c: <offset 0x00000000000c130c> in /usr/bin/python3 at 0x0000000000400000
+
+Top of Stack: (sp=0x0000ffff077fb0a0)
+0x0000ffff077fb0a0:   0000ffff077fb0c0 00000000004c130c
+0x0000ffff077fb0b0:   0000ffff7c0e1400 0000ffff7f7b3df0
+0x0000ffff077fb0c0:   0000ffff077fb0e0 0000ffff8c6c6488
+0x0000ffff077fb0d0:   0000ffff077fb1b0 5f5c7ff9d17f5a00
+0x0000ffff077fb0e0:   0000ffff077fb100 0000ffff8c6c64b4
+0x0000ffff077fb0f0:   0000ffff077fb1a8 0000ffff8c6a9944
+0x0000ffff077fb100:   0000ffff077fb110 0000ffff8c6c7434
+0x0000ffff077fb110:   0000ffff077fb140 0000ffff8c6a994c
+0x0000ffff077fb120:   0000ffff077fb190 0000fffef8014070
+0x0000ffff077fb130:   0000ffff077fb1a8 5f5c7ff9d17f5a00
+0x0000ffff077fb140:   0000ffff077fb210 0000ffff8c6aa814
+0x0000ffff077fb150:   0000ffff78006bb0 0000fffef80548c0
+0x0000ffff077fb160:   0000ffff077fb250 0000ffff077fb248
+0x0000ffff077fb170:   0000ffff077fb310 0000ffff077fb1c8
+0x0000ffff077fb180:   0000ffff077fb328 0000ffff077fb308
+0x0000ffff077fb190:   0000ffff78006bb0 0000fffef831a348
+0x0000ffff077fb1a0:   0000ffff077f0100 00000000008e9140
+0x0000ffff077fb1b0:   0000ffff7c0e1400 0000000000000000
+0x0000ffff077fb1c0:   0000ffff077fb200 0000ffff8c6aa6f8
+0x0000ffff077fb1d0:   0000ffff077fb1f0 0000ffff8c6c7224
+0x0000ffff077fb1e0:   0000ffff077fb248 00000000008e9140
+0x0000ffff077fb1f0:   0000ffff7c0e1400 0000ffff8c6aa808
+0x0000ffff077fb200:   0000ffff78006bb0 5f5c7ff9d17f5a00
+0x0000ffff077fb210:   0000ffff077fb290 0000ffff8c6bd650
+0x0000ffff077fb220:   0000ffff78006bb0 0000fffef831a348
+0x0000ffff077fb230:   0000ffff077fb328 0000ffff077fb308
+0x0000ffff077fb240:   0000ffff077fb260 0000000000000000
+0x0000ffff077fb250:   0000ffff78006bb0 0000fffef831a348
+0x0000ffff077fb260:   0000ffff077f0000 0000ffff077fb278
+0x0000ffff077fb270:   0000000000000005 0000000a656e6f4e
+0x0000ffff077fb280:   0000ffff78006bb0 5f5c7ff9d17f5a00
+0x0000ffff077fb290:   0000ffff077fb420 0000ffff6861b604 
+
+Instructions: (pc=0x00000000004c10d4)
+0x00000000004c0fd4:   00 00 80 12 f1 ff ff 17 4c 21 00 b0 8d 10 00 b0
+0x00000000004c0fe4:   a1 e1 17 91 80 59 40 f9 a5 56 01 94 00 00 80 12
+0x00000000004c0ff4:   ea ff ff 17 1f 20 03 d5 1f 20 03 d5 fd 7b bf a9
+0x00000000004c1004:   fd 03 00 91 21 04 00 b4 a2 20 00 b0 43 60 04 91
+0x00000000004c1014:   3f 00 03 eb c0 00 00 54 26 04 40 f9 e4 20 00 d0
+0x00000000004c1024:   85 20 1a 91 df 00 05 eb 21 02 00 54 28 00 40 f9
+0x00000000004c1034:   07 10 40 f9 09 05 00 91 29 00 00 f9 01 10 00 f9
+0x00000000004c1044:   87 00 00 b5 00 00 80 52 fd

@@ -1,0 +1,189 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x00000000005b2d68, pid=1426, tid=1463
+#
+# JRE version: OpenJDK Runtime Environment 18.9 (11.0.16+8) (build 11.0.16+8)
+# Java VM: OpenJDK 64-Bit Server VM 18.9 (11.0.16+8, mixed mode, sharing, tiered, compressed oops, g1 gc, linux-aarch64)
+# Problematic frame:
+# C  [python3+0x1b2d68]
+#
+# No core dump will be written. Core dumps have been disabled. To enable core dumping, try "ulimit -c unlimited" before starting Java again
+#
+# If you would like to submit a bug report, please visit:
+#   https://bugreport.java.com/bugreport/crash.jsp
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: -Dlogback.level.org.optaplanner=INFO 
+
+Host: AArch64, 4 cores, 9G, Debian GNU/Linux 11 (bullseye)
+Time: Sat Nov 25 13:52:56 2023 UTC elapsed time: 58.200930 seconds (0d 0h 0m 58s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x0000ffff28020800):  JavaThread "Thread-3" daemon [_thread_in_native, id=1463, stack(0x0000ffff1f801000,0x0000ffff20000000)]
+
+Stack: [0x0000ffff1f801000,0x0000ffff20000000],  sp=0x0000ffff1fffba00,  free space=8170k
+Native frames: (J=compiled Java code, A=aot compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  [python3+0x1b2d68]
+C  [python3+0xa5124]  _PyObject_MakeTpCall+0x1b0
+C  [python3+0x9c568]  _PyEval_EvalFrameDefault+0x4a78
+C  [python3+0x964f8]
+C  [python3+0xb1c4c]  _PyFunction_Vectorcall+0x3ac
+C  [python3+0x98064]  _PyEval_EvalFrameDefault+0x574
+C  [python3+0x96b1c]
+C  [python3+0xb1d20]  _PyFunction_Vectorcall+0x480
+C  [python3+0xc1d88]
+C  [python3+0xa5180]  _PyObject_MakeTpCall+0x20c
+C  [python3+0x9ccf4]  _PyEval_EvalFrameDefault+0x5204
+C  [python3+0x964f8]
+C  [python3+0xb1c4c]  _PyFunction_Vectorcall+0x3ac
+C  [python3+0x9c258]  _PyEval_EvalFrameDefault+0x4768
+C  [python3+0xb1a48]  _PyFunction_Vectorcall+0x1a8
+C  [python3+0x98218]  _PyEval_EvalFrameDefault+0x728
+C  [python3+0xb1a48]  _PyFunction_Vectorcall+0x1a8
+C  [python3+0x98218]  _PyEval_EvalFrameDefault+0x728
+C  [python3+0xb1a48]  _PyFunction_Vectorcall+0x1a8
+C  [python3+0x98218]  _PyEval_EvalFrameDefault+0x728
+C  [python3+0xb1a48]  _PyFunction_Vectorcall+0x1a8
+C  [python3+0x98218]  _PyEval_EvalFrameDefault+0x728
+C  [python3+0xb1a48]  _PyFunction_Vectorcall+0x1a8
+C  [python3+0x98218]  _PyEval_EvalFrameDefault+0x728
+C  [python3+0xb1a48]  _PyFunction_Vectorcall+0x1a8
+C  [python3+0x98218]  _PyEval_EvalFrameDefault+0x728
+C  [python3+0xb1a48]  _PyFunction_Vectorcall+0x1a8
+C  [python3+0x98218]  _PyEval_EvalFrameDefault+0x728
+C  [python3+0x964f8]
+C  [python3+0xb1d20]  _PyFunction_Vectorcall+0x480
+C  [python3+0xc6ac8]
+C  [python3+0xc71a4]  PyObject_Call+0xb0
+C  [python3+0x998b4]  _PyEval_EvalFrameDefault+0x1dc4
+C  [python3+0x964f8]
+C  [python3+0xb1d20]  _PyFunction_Vectorcall+0x480
+C  [python3+0xc6ac8]
+C  [python3+0x99204]  _PyEval_EvalFrameDefault+0x1714
+C  [python3+0xb1a48]  _PyFunction_Vectorcall+0x1a8
+C  [python3+0x98064]  _PyEval_EvalFrameDefault+0x574
+C  [python3+0x96b1c]
+C  [python3+0xb1ca0]  _PyFunction_Vectorcall+0x400
+C  [python3+0x98218]  _PyEval_EvalFrameDefault+0x728
+C  [python3+0xb1a48]  _PyFunction_Vectorcall+0x1a8
+C  [python3+0xc6b50]
+C  [python3+0x998b4]  _PyEval_EvalFrameDefault+0x1dc4
+C  [python3+0xb1a48]  _PyFunction_Vectorcall+0x1a8
+C  [python3+0x98218]  _PyEval_EvalFrameDefault+0x728
+C  [python3+0xb1a48]  _PyFunction_Vectorcall+0x1a8
+C  [python3+0x98218]  _PyEval_EvalFrameDefault+0x728
+C  [python3+0xb1a48]  _PyFunction_Vectorcall+0x1a8
+C  [python3+0xc6b50]
+C  [python3+0x220f40]
+C  [python3+0x220bb0]
+C  [libpthread.so.0+0x7648]  start_thread+0x174
+
+
+siginfo: si_signo: 11 (SIGSEGV), si_code: 1 (SEGV_MAPERR), si_addr: 0x0000000000000010
+
+Register to memory mapping:
+
+R0=0x0000000000000000
+R1=0x0000000000000000
+R2=0x0000000000000014
+R3=0x0000000000000002
+R4=0x0000000000000015
+R5=0x0000000000000001
+R6=0x00000000004ee000
+R7=0x00000000004eed34
+R8=0x00000000005b2d64
+R9=0x0000ffff1ffff1e0
+R10=0x0000000000000000
+R11=0x0000000000918ad8
+R12=0x00000000006ec99a
+R13=0x0000000000000073
+R14=0x0000000000000001
+R15=0x0000000000000039
+R16=0x00000000008d5f30
+R17=0x0000ffffbd47bf90
+R18=0x000000007fffffff
+R19=0x0000ffff1dda21d0
+R20=0x00000000008e0c60
+R21=0x00000000005b2d64
+R22=0x00000000181e1c20
+R23=0x0000000000000bb8
+R24=0x000000001939fa70
+R25=0x00000000004a5810
+R26=0x0000000000000000
+R27=0x00000000008e0c60
+R28=0x0000ffff1de7c9a0
+R29=0x0000ffff1fffba00
+R30=0x00000000004edb74
+
+
+Registers:
+R0 =0x0 is NULL
+R1 =0x0 is NULL
+R2 =0x0000000000000014 is an unknown value
+R3 =0x0000000000000002 is an unknown value
+R4 =0x0000000000000015 is an unknown value
+R5 =0x0000000000000001 is an unknown value
+R6 =0x00000000004ee000: <offset 0x00000000000ee000> in /usr/bin/python3 at 0x0000000000400000
+R7 =0x00000000004eed34: <offset 0x00000000000eed34> in /usr/bin/python3 at 0x0000000000400000
+R8 =0x00000000005b2d64: <offset 0x00000000001b2d64> in /usr/bin/python3 at 0x0000000000400000
+R9 =0x0000ffff1ffff1e0 is pointing into the stack for thread: 0x0000ffff18014000
+R10=0x0 is NULL
+R11=0x0000000000918ad8: _PyRuntime+0x0000000000000248 in /usr/bin/python3 at 0x0000000000400000
+R12=0x00000000006ec99a: <offset 0x00000000002ec99a> in /usr/bin/python3 at 0x0000000000400000
+R13=0x0000000000000073 is an unknown value
+R14=0x0000000000000001 is an unknown value
+R15=0x0000000000000039 is an unknown value
+R16=0x00000000008d5f30: <offset 0x00000000004d5f30> in /usr/bin/python3 at 0x0000000000400000
+R17=0x0000ffffbd47bf90: pthread_self+0x0000000000000000 in /lib/aarch64-linux-gnu/libc.so.6 at 0x0000ffffbd408000
+R18=0x000000007fffffff is an unknown value
+R19=0x0000ffff1dda21d0 points into unknown readable memory: 0x0000000000000014 | 14 00 00 00 00 00 00 00
+R20=0x00000000008e0c60: PyUnicode_Type+0x0000000000000000 in /usr/bin/python3 at 0x0000000000400000
+R21=0x00000000005b2d64: <offset 0x00000000001b2d64> in /usr/bin/python3 at 0x0000000000400000
+R22=0x00000000181e1c20 points into unknown readable memory: 0x0000000000000000 | 00 00 00 00 00 00 00 00
+R23=0x0000000000000bb8 is an unknown value
+R24=0x000000001939fa70 points into unknown readable memory: 0x0000ffff14001380 | 80 13 00 14 ff ff 00 00
+R25=0x00000000004a5810: <offset 0x00000000000a5810> in /usr/bin/python3 at 0x0000000000400000
+R26=0x0 is NULL
+R27=0x00000000008e0c60: PyUnicode_Type+0x0000000000000000 in /usr/bin/python3 at 0x0000000000400000
+R28=0x0000ffff1de7c9a0 points into unknown readable memory: 0x0000000000000001 | 01 00 00 00 00 00 00 00
+R29=0x0000ffff1fffba00 is pointing into the stack for thread: 0x0000ffff18014000
+R30=0x00000000004edb74: <offset 0x00000000000edb74> in /usr/bin/python3 at 0x0000000000400000
+
+Top of Stack: (sp=0x0000ffff1fffba00)
+0x0000ffff1fffba00:   0000ffff1fffba80 00000000004a5124
+0x0000ffff1fffba10:   0000ffff1f5edeb0 0000000000000014
+0x0000ffff1fffba20:   000000001939fa70 00000000008e0c60
+0x0000ffff1fffba30:   0000000000000000 000000001939fa70
+0x0000ffff1fffba40:   0000ffff1fffba60 000000000049c650
+0x0000ffff1fffba50:   0000ffffbd15a240 0000000000000000
+0x0000ffff1fffba60:   0000000000000000 0000ffff1dda21d0
+0x0000ffff1fffba70:   0000ffff1ffff1e0 0000000000497af0
+0x0000ffff1fffba80:   0000ffff1fffbae0 000000000049c568
+0x0000ffff1fffba90:   0000ffff940113b8 0000ffff940113b0
+0x0000ffff1fffbaa0:   000000000091883c 00000000181e1c60
+0x0000ffff1fffbab0:   000000001939fa70 0000ffff1de7cb30
+0x0000ffff1fffbac0:   0000000000000083 0000ffff1de7cb20
+0x0000ffff1fffbad0:   00000000006ce8e0 00000000181e1c68
+0x0000ffff1fffbae0:   0000ffff1fffbc60 00000000004964f8
+0x0000ffff1fffbaf0:   0000ffff1de7c9a0 00000000181e1c20
+0x0000ffff1fffbb00:   000000001939fa70 0000ffff9405c748
+0x0000ffff1fffbb10:   00000000000002a0 0000000000000000
+0x0000ffff1fffbb20:   0000ffffbd370040 0000000000000002
+0x0000ffff1fffbb30:   0000000000000001 0000000000000000
+0x0000ffff1fffbb40:   000000770000005c 0000000000000000
+0x0000ffff1fffbb50:   00000000006ce8e0 00000000181e1c68
+0x0000ffff1fffbb60:   0000ffff1de7cb08 0000ffff9406d640
+0x0000ffff1fffbb70:   0000ffff940129f0 0000ffff94015190
+0x0000ffff1fffbb80:   00000000181e1c20 0000ffff285f6550
+0x0000ffff1fffbb90:   00000000006ce750 000000000049725c
+0x0000ffff1fffbba0:   0000ffff1fffbbe0 ffffffffffffffff
+0x0000ffff1fffbbb0:   0000ffff1de7cb20 00000000006ce8a0
+0x0000ffff1fffbbc0:   000000001939fa70 00000000004a4ca0
+0x0000ffff1fffbbd0:   0000ffff1fffbc60 0000000000496678
+0x0000ffff1fffbbe0:   0000ffff1fffbce0 00000000004b1d20

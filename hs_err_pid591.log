@@ -1,0 +1,88 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x000000000047749c, pid=591, tid=591
+#
+# JRE version: OpenJDK Runtime Environment 18.9 (11.0.16+8) (build 11.0.16+8)
+# Java VM: OpenJDK 64-Bit Server VM 18.9 (11.0.16+8, mixed mode, sharing, tiered, compressed oops, g1 gc, linux-aarch64)
+# Problematic frame:
+# C  [python3+0x7749c]  PyUnicode_New+0x9c
+#
+# No core dump will be written. Core dumps have been disabled. To enable core dumping, try "ulimit -c unlimited" before starting Java again
+#
+# If you would like to submit a bug report, please visit:
+#   https://bugreport.java.com/bugreport/crash.jsp
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: -Dlogback.level.org.optaplanner=INFO 
+
+Host: AArch64, 4 cores, 9G, Debian GNU/Linux 11 (bullseye)
+Time: Thu Nov 23 20:12:26 2023 UTC elapsed time: 0.842433 seconds (0d 0h 0m 0s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x0000000007c8e800):  JavaThread "main" [_thread_in_native, id=591, stack(0x0000ffffd532a000,0x0000ffffd552a000)]
+
+Stack: [0x0000ffffd532a000,0x0000ffffd552a000],  sp=0x0000ffffd55279a0,  free space=2038k
+Native frames: (J=compiled Java code, A=aot compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  [python3+0x7749c]  PyUnicode_New+0x9c
+C  [python3+0xec770]  PyUnicode_Substring+0x7c
+C  [python3+0x1db9a8]  PyFile_GetLine+0xc8
+C  [python3+0x1d5fa4]  _Py_DisplaySourceLine+0x1d4
+C  [python3+0x1d1678]  PyTraceBack_Print+0x178
+C  [python3+0x1b1c90]
+C  [python3+0x1b1970]  _PyErr_Display+0x80
+C  [python3+0x1cc948]
+C  [python3+0xb279c]
+C  [python3+0x19997c]
+C  [python3+0x1cc1bc]
+C  [python3+0x1c7c5c]  PyRun_SimpleFileExFlags+0x1ac
+C  [python3+0x1b7afc]  Py_RunMain+0x21c
+C  [python3+0x187638]  Py_BytesMain+0x24
+C  [libc.so.6+0x20e18]  __libc_start_main+0xe8
+
+
+siginfo: si_signo: 11 (SIGSEGV), si_code: 1 (SEGV_MAPERR), si_addr: 0x000000000000000a
+
+Register to memory mapping:
+
+R0=0x0000000000000005
+R1=0x00000000008d6098
+R2=0x0000000000475000
+R3=0x00000000008d6000
+R4=0x00000000004758c4
+R5=0x00000000004758c4
+R6=0x0000000000000054
+R7=0x0000000000000054
+R8=0x00000000008d6000
+R9=0x00000000008d6140
+R10=0x000000000000000a
+R11=0x0000ffff97e27000
+R12=0x00000000008d6180
+R13=0x0000000000000007
+R14=0x0000000000000008
+R15=0x0000ffff97e2725a
+R16=0x00000000008d5348
+R17=0x0000ffffad4b98c0
+R18=0x0000000000000024
+R19=0x000000000000000a
+R20=0x0000000000000024
+R21=0x0000ffff97e27242
+R22=0x0000000000000001
+R23=0x0000000000000055
+R24=0x0000000000000000
+R25=0x0000ffffad379ee0
+R26=0x0000ffff97ee7520
+R27=0x00000000006ad5d8
+R28=0x0000000006e68aa0
+R29=0x0000ffffd55279a0
+R30=0x00000000004ec770
+
+
+Registers:
+R0 =0x0000000000000005 is an unknown value
+R1 =0x00000000008d6098: <offset 0x00000000004d6098> in python3 at 0x0000000000400000
