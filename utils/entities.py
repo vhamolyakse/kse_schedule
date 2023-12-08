@@ -74,11 +74,13 @@ class Timeslot:
 
 @planning_entity
 class Lesson:
-    def __init__(self, id, subject, teacher, student_group, student_group_capacity, group_intersection, timeslot=None, room=None, ideal_timeslot_id=None, ideal_room_id=None, forbidden_timeslots=None, is_fixed=False):
+    def __init__(self, id, subject, teacher, teacher_id, is_lection, student_group, student_group_capacity, group_intersection, timeslot=None, room=None, ideal_timeslot_id=None, ideal_room_id=None, forbidden_timeslots=None, is_fixed=False):
         self.id = id
         self.subject = subject
         self.is_fixed = is_fixed
         self.teacher = teacher
+        self.teacher_id = teacher_id
+        self.is_lection = is_lection
         self.student_group = student_group
         self.student_group_capacity = student_group_capacity
         self.timeslot = timeslot
@@ -121,7 +123,7 @@ class Lesson:
             f"room={self.room}, "
             f"teacher={self.teacher.name}, "
             f"subject={self.subject}, "
-            f"ideal_timeslot={self.ideal_timeslot}, "
+            f"ideal_timeslot={self.ideal_timeslot_id}, "
             f"student_group={self.student_group}"
             f")"
         )

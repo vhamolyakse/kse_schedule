@@ -3,3 +3,5 @@ optapy==9.37.0b0
 IPython==8.17.2
 loguru==0.7.2
 openpyxl==3.1.2
+pandas~=2.1.1
+numpy~=1.26.0

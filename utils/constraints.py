@@ -8,7 +8,7 @@ from loguru import logger
 LessonClass = get_class(Lesson)
 RoomClass = get_class(Room)
 
-SOLVING_DURATION = 10
+SOLVING_DURATION = 60
 
 @constraint_provider
 def define_constraints(constraint_factory):
