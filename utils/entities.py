@@ -6,8 +6,9 @@ from optapy.score import HardSoftScore
 
 @problem_fact
 class StudentGroup:
-    def __init__(self, id, name, students_count):
+    def __init__(self, id, group_id, name, students_count):
         self.id = id
+        self.group_id = group_id
         self.name = name
         self.students_count = students_count
         
@@ -17,18 +18,22 @@ class StudentGroup:
         return self.id
 
     def __str__(self):
-        return f"StudentGroup(id={self.id}, name={self.name}, students={self.students_count})"
+        return f"StudentGroup(id={self.id}, group_id={self.group_id},  name={self.name}, students={self.students_count})"
 
 
 
 @problem_fact
 class Teacher:
-    def __init__(self, name, availability=None):
+    def __init__(self, name, teacher_online_availability, availability=None):
         self.name = name
+        self.teacher_online_availability = teacher_online_availability
         self.availability = availability
 
     def is_available(self, timeslot):
         return self.availability.get(timeslot.id, 0) == 1
+
+    def need_online(self, timeslot):
+        return self.teacher_online_availability.get(timeslot.id, 0) == 1
 
     def __str__(self):
         return f"Teacher(name={self.name})"
@@ -37,9 +42,11 @@ class Teacher:
 from optapy import problem_fact, planning_id
 @problem_fact
 class Room:
-    def __init__(self, id, name, capacity):
+    def __init__(self, id, auditory_id, name, is_online, capacity):
         self.id = id
+        self.auditory_id = auditory_id
         self.name = name
+        self.is_online = is_online
         self.capacity = capacity
 
     @planning_id
@@ -74,8 +81,9 @@ class Timeslot:
 
 @planning_entity
 class Lesson:
-    def __init__(self, id, subject, teacher, teacher_id, is_lection, student_group, student_group_capacity, group_intersection, timeslot=None, room=None, ideal_timeslot_id=None, ideal_room_id=None, forbidden_timeslots=None, is_fixed=False):
+    def __init__(self, id, lesson_id, subject, teacher, teacher_id, is_lection, student_group, student_group_capacity, is_online, group_intersection,timeslot=None, room=None, ideal_timeslot_id=None, ideal_room_id=None, forbidden_timeslots=None, is_fixed=False):
         self.id = id
+        self.lesson_id = lesson_id
         self.subject = subject
         self.is_fixed = is_fixed
         self.teacher = teacher
@@ -88,6 +96,7 @@ class Lesson:
         self.ideal_timeslot_id = ideal_timeslot_id
         self.ideal_room_id = ideal_room_id
         self.forbidden_timeslots = forbidden_timeslots if forbidden_timeslots else {}
+        self.is_online = is_online
         self.group_intersection = group_intersection
 
 

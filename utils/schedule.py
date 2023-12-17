@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from datetime import timedelta, datetime
 import json
 # from pandas import json_normalize
@@ -34,6 +35,7 @@ class ScheduleManager:
 
     def __init__(self, optapy_solution=None, raw_schedule_df=None, start_date=None):
         self.start_date = start_date
+        self.id_shed = 2
         if optapy_solution is not None:
             self.raw_schedule_df = self._parse_optapy_solution(optapy_solution)
         else:
@@ -41,13 +43,13 @@ class ScheduleManager:
 
     def _parse_optapy_solution(self, solution):
         day_map = {
-            'MONDAY': 0,
-            'TUESDAY': 1,
-            'WEDNESDAY': 2,
-            'THURSDAY': 3,
-            'FRIDAY': 4,
-            'SATURDAY': 5,
-            'SUNDAY': 6
+            'MONDAY': 1,
+            'TUESDAY': 2,
+            'WEDNESDAY': 3,
+            'THURSDAY': 4,
+            'FRIDAY': 5,
+            'SATURDAY': 6,
+            'SUNDAY': 7
         }
         scheduling_records_data = []
         for num, l in enumerate(solution.get_lesson_list()):
@@ -56,7 +58,7 @@ class ScheduleManager:
             scheduling_records_data.append({
                 'room': f"{l.room.name} [{l.room.capacity}]",
                 'student_group': f"{l.student_group.name}",
-                'student_group_id': f"{l.student_group.id}",
+                'student_group_id': l.student_group.group_id,
                 # [{l.student_group_capacity}]",
                 'div': 6,
                 'subject': l.subject,
@@ -66,14 +68,17 @@ class ScheduleManager:
                 'lesson_date': lesson_date,
                 'start_time': l.timeslot.start_time,
                 'num_pair': _get_pair_number(l.timeslot.start_time),
-                'lesson_id': l.id,
+                'lesson_id': l.lesson_id,
+                'is_online': l.is_online,
                 'room_id': l.room.id,
+                'auditory_id': l.room.auditory_id,
                 'time_slot_id': l.timeslot.id,
                 'schedule_id': num,
                 'teacher_id': l.teacher_id,
                 'is_lection': l.is_lection
             })
-
+        # import pdb
+        # pdb.set_trace()
         raw_schedule_df = pd.DataFrame(scheduling_records_data)
         return raw_schedule_df
 
@@ -88,10 +93,9 @@ class ScheduleManager:
             raw_schedule_df[col] = raw_schedule_df[col].apply(lambda x: x.strftime('%H:%M') if pd.notnull(x) else None)
 
         mapping = {
-            'room_id': 'ID_AUD',
+            'auditory_id': 'ID_AUD',
             'div': 'ID_DIV',
-            'schedule_id': 'ID_SHED',
-            'subject': 'ID_DISC',
+            'lesson_id': 'ID_DISC',
             'is_lection': 'ID_STUD',
             'teacher_id': 'ID_TEACH',
             'num_pair': 'NUM_PAIR',
@@ -101,28 +105,60 @@ class ScheduleManager:
         }
 
         df_mapped = raw_schedule_df.rename(columns=mapping)
-        df_mapped = df_mapped[['ID_AUD', 'ID_DIV', 'ID_SHED', 'ID_DISC', 'ID_STUD', 'ID_TEACH', 'NUM_PAIR', 'DATE_PAIR', 'GROUPS']]
-        # print(df_mapped)
-        records = df_mapped.to_json()
-        json_data = json.dumps(records, indent=2)
+
+        df_mapped1 = df_mapped[['ID_AUD', 'ID_DIV']]
+        df_mapped1['ID_SHED'] = self.id_shed
+        df_mapped2 = df_mapped[['ID_DISC', 'ID_STUD', 'ID_TEACH', 'NUM_PAIR', 'DATE_PAIR', 'GROUPS']]
+        df_mapped = pd.concat([df_mapped1, df_mapped2], axis=1, join='outer')
+
+        df_mapped['ID_STUD'] = df_mapped['ID_STUD'].replace({0: 2})
+        df_mapped['GROUPS'] = df_mapped['GROUPS'].apply(lambda x: [x])
+
+        print(df_mapped)
+        json_data = df_mapped.to_json(orient='records')
+        # json_data = json.dumps(records, indent=2)
 
         return json_data
 
 
     def raw_schedule_to_pretty(self, raw_schedule_df):
+        raw_schedule_df['is_lection'] = np.where(self.raw_schedule_df['is_lection'] == 1,
+                                                             'лекція',
+                                                             'практика')
+        raw_schedule_df['is_online'] = np.where(self.raw_schedule_df['is_online'] == 1,
+                                                 'онлайн',
+                                                 'офлайн')
         raw_schedule_df['text'] = raw_schedule_df.apply(
-            lambda row: f"{row['subject']}\n{row['student_group']}\n{row['teacher']}\n[{row['schedule_id']}]", axis=1)
+            lambda row: f"{row['subject']}\n{row['student_group']}\n{row['teacher']}\n{row['is_lection']}\n{row['is_online']}\n[{row['schedule_id']}]", axis=1)
         # print(raw_schedule_df.columns)
         # print(raw_schedule_df[['day', 'start_time', 'day_of_week', 'num_pair', 'teacher_id', 'is_lection']])
         # print(raw_schedule_df['start_time'].dtype)
-        pivot_df = raw_schedule_df.pivot(index=['day', 'start_time'], columns='room', values='text')
 
-        df = pivot_df.fillna('').copy()
-        df = df.reset_index()
+        raw_schedule_df['dup_id'] = raw_schedule_df.groupby(['day', 'start_time', 'room']).cumcount()
+        pivot_df = raw_schedule_df.set_index(['day', 'start_time', 'room', 'dup_id']).unstack(['room', 'dup_id'])
+
+        # raw_schedule_df = raw_schedule_df.drop_duplicates(['day', 'start_time', 'room'])
+        # print(raw_schedule_df.room.unique())
+
+        pivot_df.columns = [' '.join(map(str, col)).strip() for col in pivot_df.columns.values]
+        pivot_df = pivot_df.reset_index()
+        # pivot_df = raw_schedule_df.pivot(index=['day', 'start_time'], columns='room', values='text')
+
+
+        # df = pivot_df.fillna('').copy()
+        # df = df.reset_index()
+        # days_order = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY']
+        # df['day_int'] = df['day'].apply(lambda d: days_order.index(d))
+        # df.sort_values(by=['day_int', 'start_time'], inplace=True)
+        # df.drop('day_int', axis=1, inplace=True)
+
         days_order = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY']
-        df['day_int'] = df['day'].apply(lambda d: days_order.index(d))
-        df.sort_values(by=['day_int', 'start_time'], inplace=True)
-        df.drop('day_int', axis=1, inplace=True)
+        pivot_df['day_int'] = pivot_df['day'].apply(lambda d: days_order.index(d))
+        pivot_df.sort_values(by=['day_int', 'start_time'], inplace=True)
+        pivot_df.drop(['day_int'], axis=1, inplace=True)
+        columns_to_keep = [col for col in pivot_df.columns if 'text' in col or col in ['day', 'start_time']]
+        pivot_df = pivot_df[columns_to_keep]
+        print(pivot_df.columns)
 
         # raw_schedule_df['text'] = raw_schedule_df.apply(lambda row: f"{row['subject']}\n{row['student_group']}\n{row['teacher']}\n[{row['schedule_id']}]", axis=1)
 
@@ -143,4 +179,4 @@ class ScheduleManager:
         # df['day_int'] = df['day'].apply(lambda d: days_order.index(d))
         # df.sort_values(by=['day_int', 'start_time'], inplace=True)
         # df.drop('day_int', axis=1, inplace=True)
-        return df
+        return pivot_df.fillna('')  # df

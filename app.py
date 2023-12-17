@@ -48,7 +48,7 @@ def generate_new_schedule(selected_date):
     explanation = score_manager.explainScore(solution)
 
     st.write(f"Final score: {str(solution.get_score())}")
-    # st.write(f"Score explanation: {str(explanation)}")
+    st.write(f"Score explanation: {str(explanation)}")
 
     schedule_manager = ScheduleManager(optapy_solution=solution, start_date=selected_date)
     raw_schedule_df = schedule_manager.raw_schedule_df
