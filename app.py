@@ -96,12 +96,13 @@ def main():
         generate_new_schedule(selected_date)
 
     existing_schedule_file = st.file_uploader("Existing raw schedule")
+    print(existing_schedule_file)
 
     if existing_schedule_file is not None:
         logger.debug('Existing schedule')
         raw_schedule_df = pd.read_csv(existing_schedule_file)
 
-        schedule_manager = ScheduleManager(raw_schedule_df=raw_schedule_df)
+        schedule_manager = ScheduleManager(raw_schedule_df=raw_schedule_df, start_date=selected_date)
         import pdb
 
         selected_option = st.selectbox('Choose the lection you would like to resckedule:',
@@ -134,7 +135,7 @@ def main():
                 else:
                     st.write(f"We have one more alternative slot")
 
-                new_raw_schedule_df = ScheduleManager(optapy_solution=solution).raw_schedule_df
+                new_raw_schedule_df = ScheduleManager(optapy_solution=solution, start_date=selected_date).raw_schedule_df
                 new_lesson_raw_schedule = new_raw_schedule_df[new_raw_schedule_df['lesson_id'] == lesson_id].iloc[0]
                 forbidden_time_slots.update({new_lesson_raw_schedule['time_slot_id']: 1})
                 logger.debug(f'Forbidden time slots: {forbidden_time_slots}')

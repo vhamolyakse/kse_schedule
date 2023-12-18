@@ -55,6 +55,7 @@ class ScheduleManager:
         for num, l in enumerate(solution.get_lesson_list()):
             day_of_week = day_map.get(l.timeslot.day_of_week.upper(), 0)
             lesson_date = self.start_date + timedelta(days=day_of_week)
+
             scheduling_records_data.append({
                 'room': f"{l.room.name} [{l.room.capacity}]",
                 'student_group': f"{l.student_group.name}",
@@ -68,7 +69,8 @@ class ScheduleManager:
                 'lesson_date': lesson_date,
                 'start_time': l.timeslot.start_time,
                 'num_pair': _get_pair_number(l.timeslot.start_time),
-                'lesson_id': l.lesson_id,
+                'lesson_id': l.id,
+                'lesson_kse_id': l.lesson_id,
                 'is_online': l.is_online,
                 'room_id': l.room.id,
                 'auditory_id': l.room.auditory_id,
@@ -95,7 +97,7 @@ class ScheduleManager:
         mapping = {
             'auditory_id': 'ID_AUD',
             'div': 'ID_DIV',
-            'lesson_id': 'ID_DISC',
+            'lesson_kse_id': 'ID_DISC',
             'is_lection': 'ID_STUD',
             'teacher_id': 'ID_TEACH',
             'num_pair': 'NUM_PAIR',

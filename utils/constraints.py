@@ -9,7 +9,7 @@ from loguru import logger
 LessonClass = get_class(Lesson)
 RoomClass = get_class(Room)
 
-SOLVING_DURATION = 75
+SOLVING_DURATION = 30
 
 
 @constraint_provider
