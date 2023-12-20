@@ -36,7 +36,6 @@ def room_conflict(constraint_factory):
     # A room can accommodate at most one lesson at the same time.
     return constraint_factory \
         .forEach(LessonClass) \
-        .filter(lambda lesson: lesson.is_online == 0) \
         .join(LessonClass,
               [
                   # ... in the same timeslot ...
@@ -44,8 +43,9 @@ def room_conflict(constraint_factory):
                   # ... in the same room ...
                   Joiners.equal(lambda lesson: lesson.room),
                   # ... and the pair is unique (different id, no reverse pairs) ...
-                  Joiners.lessThan(lambda lesson: lesson.id)
-
+                  Joiners.lessThan(lambda lesson: lesson.id),
+                  # ... exclude the conflict for online rooms ...
+                  Joiners.filtering(lambda lessonA, lessonB: not (lessonA.room.is_online or lessonB.room.is_online))
               ]) \
         .penalize("Room conflict", HardSoftScore.ONE_HARD)
 

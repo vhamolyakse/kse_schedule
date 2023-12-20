@@ -50,6 +50,9 @@ class DataManager:
                                                                                axis=1)
         self.input_audiences_df = self.input_audiences_df.rename(columns={'id': 'kse_id'})
         self.input_audiences_df['is_online'] = np.where(self.input_audiences_df['is_shelter_id'] == 0, 1, 0)
+
+        # self.input_audiences_df = self.input_audiences_df[self.input_audiences_df['is_online'] != 1]
+
         self.input_audiences_df['id'] = np.arange(self.input_audiences_df.shape[0])
         self.input_audiences_df['capacity'] = self.input_audiences_df.apply(
             lambda row: row['capacity'] + 50 if row['name'] == '1003_TA Ventures Classroom' else row['capacity'],
