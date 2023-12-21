@@ -105,7 +105,7 @@ def main():
         raw_schedule_df = pd.read_csv(existing_schedule_file)
 
         schedule_manager = ScheduleManager(raw_schedule_df=raw_schedule_df, start_date=selected_date)
-        import pdb
+        # import pdb
 
         selected_option = st.selectbox('Choose the lection you would like to resckedule:',
                                        raw_schedule_df['text'].values.tolist())
@@ -158,8 +158,8 @@ def main():
             selected_index = st.session_state['alternatives_for_selected_lesson'].index(selected_option)
             new_raw_schedule_df = st.session_state['alternatives_new_raw_schedule_df'][selected_index]
 
-            import pdb
-            pdb.set_trace()
+            # import pdb
+            # pdb.set_trace()
 
             new_pretty_schedule_df = schedule_manager.raw_schedule_to_pretty(new_raw_schedule_df)
             raw_schedule_csv = convert_df_to_csv(new_raw_schedule_df)
