@@ -8,13 +8,14 @@ from .entities import Lesson, Room, Timeslot, TimeTable, StudentGroup, Teacher
 
 
 class DataManager:
-    def __init__(self, data_path, existing_schedule_df=None):
+    def __init__(self, data_path, solving_duration, existing_schedule_df=None):
         self.input_audiences_df = pd.read_csv(f'{data_path}/audiences.csv').map(strip_whitespace)
         self.input_groups_df = pd.read_csv(f'{data_path}/groups.csv').map(strip_whitespace)
         self.input_students_df = pd.read_csv(f'{data_path}/students.csv').map(strip_whitespace)
         self.input_lessons_df = pd.read_csv(f'{data_path}/lessons.csv').map(strip_whitespace)
         self.input_teachers_df = pd.read_csv(f'{data_path}/teachers.csv')
 
+        self.solving_duration = solving_duration
         self.group_to_pupils = {}
         self.group_to_id = {}
         self.group_id = {}
@@ -51,6 +52,7 @@ class DataManager:
         self.input_audiences_df = self.input_audiences_df.rename(columns={'id': 'kse_id'})
         self.input_audiences_df['is_online'] = np.where(self.input_audiences_df['is_shelter_id'] == 0, 1, 0)
 
+        # without online:
         # self.input_audiences_df = self.input_audiences_df[self.input_audiences_df['is_online'] != 1]
 
         self.input_audiences_df['id'] = np.arange(self.input_audiences_df.shape[0])
@@ -85,7 +87,7 @@ class DataManager:
         # TODO: add support of online lections
         # self.input_lessons_df = self.input_lessons_df[self.input_lessons_df['format'] == 'офлайн']
         self.input_lessons_df['is_online'] = np.where(self.input_lessons_df['format'] == 'офлайн', 0, 1)
-        print(sum(self.input_audiences_df['is_online']))
+        # print(sum(self.input_audiences_df['is_online']))
         # online_room_id = self.input_audiences_df[self.input_audiences_df['is_online'] == 1]['id'].iloc[0]
         # print(online_room_id)
         # self.input_lessons_df['assigned_room_id'] = np.where(self.input_lessons_df['is_online'] == 1,
@@ -202,19 +204,19 @@ class DataManager:
 
 
 if __name__ == '__main__':
-    data_manager = DataManager('uploaded_files')
+    data_manager = DataManager('uploaded_files', solving_duration=30)
 
     import pdb
     from constraints import define_constraints, get_solver_config
     from optapy import solver_factory_create, score_manager_create
 
     problem = data_manager.generate_optapy_problem()
-    solver_config = get_solver_config()
+    solver_config = get_solver_config(data_manager.solving_duration)
     solver_factory = solver_factory_create(solver_config)
     solver = solver_factory.buildSolver()
     solution = solver.solve(problem)
     score_manager = score_manager_create(solver_factory)
     explanation = score_manager.explainScore(solution)
 
-    logger.debug(f"Final score: {str(solution.get_score())}")
-    logger.debug(f"Score explanation: {str(explanation)}")
+    # logger.debug(f"Final score: {str(solution.get_score())}")
+    # logger.debug(f"Score explanation: {str(explanation)}")

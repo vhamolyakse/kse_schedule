@@ -9,7 +9,7 @@ from loguru import logger
 LessonClass = get_class(Lesson)
 RoomClass = get_class(Room)
 
-SOLVING_DURATION = 30
+SOLVING_DURATION = 60
 
 
 @constraint_provider
@@ -36,6 +36,7 @@ def room_conflict(constraint_factory):
     # A room can accommodate at most one lesson at the same time.
     return constraint_factory \
         .forEach(LessonClass) \
+        .filter(lambda lesson: lesson.is_online == 0) \
         .join(LessonClass,
               [
                   # ... in the same timeslot ...
@@ -187,11 +188,11 @@ def penalize_lesson_in_forbidden_timeslot(constraint_factory):
         .penalize("Lesson in forbidden timeslot", HardSoftScore.ofHard(20))
 
 
-def get_solver_config():
+def get_solver_config(solving_duration):
     solver_config = optapy.config.solver.SolverConfig().withEntityClasses(get_class(Lesson)) \
         .withSolutionClass(get_class(TimeTable)) \
         .withConstraintProviderClass(get_class(define_constraints)) \
-        .withTerminationSpentLimit(Duration.ofSeconds(SOLVING_DURATION)) \
+        .withTerminationSpentLimit(Duration.ofSeconds(solving_duration)) \
         .withPhases([
         optapy.config.constructionheuristic.ConstructionHeuristicPhaseConfig(),
         optapy.config.localsearch.LocalSearchPhaseConfig()

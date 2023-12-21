@@ -35,13 +35,13 @@ from optapy.score import HardSoftScore
 RESULT_DATA_PATH = 'new_schedule/input'
 
 
-def generate_new_schedule(selected_date):
-    data_manager = DataManager(RESULT_DATA_PATH)
+def generate_new_schedule(selected_date, solving_duration):
+    data_manager = DataManager(RESULT_DATA_PATH, solving_duration)
     problem = data_manager.generate_optapy_problem()
-    solver_config = get_solver_config()
+    solver_config = get_solver_config(solving_duration)
     solver_factory = solver_factory_create(solver_config)
     solver = solver_factory.buildSolver()
-    st.write(f"Going to create schedule, it will take  {SOLVING_DURATION} seconds")
+    st.write(f"Going to create schedule, it will take  {solving_duration} seconds")
 
     solution = solver.solve(problem)
     score_manager = score_manager_create(solver_factory)
@@ -88,12 +88,14 @@ def main():
         st.error("Please select a Monday.")
         return
 
+    solving_duration = st.number_input("Set the duration for solving (in seconds)", min_value=1, value=30, step=1)
+
     uploaded_file = st.file_uploader("Input data for schedule")
     if uploaded_file is not None:
         process_file(uploaded_file, RESULT_DATA_PATH)
 
     if st.button('Generate new schedule'):
-        generate_new_schedule(selected_date)
+        generate_new_schedule(selected_date, solving_duration)
 
     existing_schedule_file = st.file_uploader("Existing raw schedule")
     print(existing_schedule_file)
@@ -116,16 +118,16 @@ def main():
             seleted_lesson_row = raw_schedule_df[raw_schedule_df['lesson_id'] == lesson_id].iloc[0]
             forbidden_time_slots = {seleted_lesson_row['time_slot_id']: 1}
             logger.debug(f'Initial forbidden time slots: {forbidden_time_slots}')
-            data_manager = DataManager(RESULT_DATA_PATH, existing_schedule_df=raw_schedule_df)
+            data_manager = DataManager(RESULT_DATA_PATH, solving_duration, existing_schedule_df=raw_schedule_df)
 
             for i in range(2):
                 logger.debug(f'For i : {i} forbidden time slots: {forbidden_time_slots}')
                 problem = data_manager.generate_optapy_problem(reschedule_lesson_id=lesson_id,
                                                                forbidden_time_slots=forbidden_time_slots)
-                solver_config = get_solver_config()
+                solver_config = get_solver_config(solving_duration)
                 solver_factory = solver_factory_create(solver_config)
                 solver = solver_factory.buildSolver()
-                st.write(f"Going to create schedule, it will take  {SOLVING_DURATION} seconds")
+                st.write(f"Going to create schedule, it will take  {solving_duration} seconds")
 
                 solution = solver.solve(problem)
                 # st.write(f"Final score: {str(solution.get_score())}")
