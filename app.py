@@ -37,7 +37,10 @@ RESULT_DATA_PATH = 'new_schedule/input'
 
 def generate_new_schedule(selected_date, solving_duration):
     data_manager = DataManager(RESULT_DATA_PATH, solving_duration)
-    problem = data_manager.generate_optapy_problem()
+    problem, error_messages = data_manager.generate_optapy_problem()
+    if error_messages:
+        for msg in error_messages:
+            st.error(msg)
     solver_config = get_solver_config(solving_duration)
     solver_factory = solver_factory_create(solver_config)
     solver = solver_factory.buildSolver()
@@ -122,8 +125,11 @@ def main():
 
             for i in range(2):
                 logger.debug(f'For i : {i} forbidden time slots: {forbidden_time_slots}')
-                problem = data_manager.generate_optapy_problem(reschedule_lesson_id=lesson_id,
+                problem, error_messages = data_manager.generate_optapy_problem(reschedule_lesson_id=lesson_id,
                                                                forbidden_time_slots=forbidden_time_slots)
+                if error_messages:
+                    for msg in error_messages:
+                        st.error(msg)
                 solver_config = get_solver_config(solving_duration)
                 solver_factory = solver_factory_create(solver_config)
                 solver = solver_factory.buildSolver()

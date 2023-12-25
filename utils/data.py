@@ -152,11 +152,15 @@ class DataManager:
             group_objects[group_name] = StudentGroup(group_num, group_id, group_name, pupils)
 
         lesson_list = []
+        error_message_list = []
 
         for num, (_, row) in enumerate(self.input_lessons_df.iterrows()):
             try:
                 # print(row)
                 teacher_id = int(self.teachers_id[row['teacher']])
+                # print(row['teacher'])
+                # if row['teacher'] == 'Кунцевич Юлія Олегівна':
+                #     print(self.teachers_availability['Кунцевич Юлія Олегівна'])
                 # print(teacher_id)
                 students_df = self.input_students_df[
                     self.input_students_df[row['subject'].strip()] == row['group']].copy()
@@ -191,7 +195,8 @@ class DataManager:
                 lesson_list.append(lesson)
                 # print('lesson: ', lesson_list)
             except Exception as e:
-                print('exception', e)
+                error_message = f"Error in processing lesson {num}: {str(e)}"
+                error_message_list.append(error_message)
             #     break
 
         lesson = lesson_list[0]
@@ -200,7 +205,7 @@ class DataManager:
         lesson.set_room(room_list[0])
 
         lesson_list[0] = lesson
-        return TimeTable(timeslot_list, room_list, lesson_list)
+        return TimeTable(timeslot_list, room_list, lesson_list), np.unique(error_message_list)
 
 
 if __name__ == '__main__':

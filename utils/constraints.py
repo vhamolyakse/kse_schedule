@@ -24,6 +24,7 @@ def define_constraints(constraint_factory):
         student_conflict(constraint_factory),
         room_online_offline_conflict(constraint_factory),
         # prefer_online_lessons_on_available_days(constraint_factory),
+        lecture_order_conflict(constraint_factory),
         penalize_lesson_not_in_ideal_timeslot(constraint_factory),
         penalize_lesson_not_in_ideal_room(constraint_factory),
         penalize_lesson_in_forbidden_timeslot(constraint_factory)
@@ -137,17 +138,39 @@ def room_online_offline_conflict(constraint_factory):
     return constraint_factory \
         .forEach(LessonClass) \
         .filter(lambda lesson: lesson.room is not None and (
-                               # Penalize online lessons not in online rooms
-                               (lesson.is_online == 1 and lesson.room.is_online == 0) or
-                               # Penalize offline lessons in online rooms if the teacher doesn't need online
-                               (lesson.is_online == 0 and lesson.room.is_online == 1 and not lesson.teacher.need_online(lesson.timeslot)) or
-                               # Penalize assigning offline rooms when the teacher needs an online room
-                               (lesson.is_online == 0 and lesson.room.is_online == 0 and lesson.teacher.need_online(lesson.timeslot))
-                               )) \
+        # Penalize online lessons not in online rooms
+            (lesson.is_online == 1 and lesson.room.is_online == 0) or
+            # Penalize offline lessons in online rooms if the teacher doesn't need online
+            (lesson.is_online == 0 and lesson.room.is_online == 1 and not lesson.teacher.need_online(
+                lesson.timeslot)) or
+            # Penalize assigning offline rooms when the teacher needs an online room
+            (lesson.is_online == 0 and lesson.room.is_online == 0 and lesson.teacher.need_online(lesson.timeslot))
+    )) \
         .penalize("Room online offline conflict", HardSoftScore.ONE_HARD)
 
 
-# def prefer_online_lessons_on_available_days(constraint_factory):
+def lecture_order_conflict(constraint_factory):
+    return constraint_factory \
+        .forEach(Lesson) \
+        .join(Lesson,
+              [
+                  # Join condition: for the same subject
+                  Joiners.equal(lambda lesson: lesson.subject),
+                  # Ensure we're not comparing the same lesson to itself
+                  Joiners.lessThan(lambda lesson: lesson.id),
+                  # Ensure one is a lecture and the other is a practice
+                  Joiners.filtering(lambda lesson, other_lesson:
+                                    (lesson.is_lection == 1 and other_lesson.is_lection == 0) or
+                                    (lesson.is_lection == 0 and other_lesson.is_lection == 1))
+              ]) \
+        .filter(lambda lesson, other_lesson:
+                lesson.is_lection == 1 and other_lesson.is_lection == 0 and
+                lesson.timeslot.id >= other_lesson.timeslot.id) \
+        .penalize("LectureBeforePracticeConflict", HardSoftScore.ONE_HARD)
+
+    # def prefer_online_lessons_on_available_days(constraint_factory):
+
+
 #     # Prefer scheduling online lessons for teachers on their available online days
 #     return constraint_factory \
 #         .forEach(LessonClass) \
