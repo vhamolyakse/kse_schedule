@@ -38,7 +38,7 @@ RESULT_DATA_PATH = 'new_schedule/input'
 def generate_new_schedule(selected_date, solving_duration):
     data_manager = DataManager(RESULT_DATA_PATH, solving_duration)
     problem, error_messages = data_manager.generate_optapy_problem()
-    if error_messages:
+    if error_messages.size > 0:
         for msg in error_messages:
             st.error(msg)
     solver_config = get_solver_config(solving_duration)

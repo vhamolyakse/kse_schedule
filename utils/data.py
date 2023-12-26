@@ -195,7 +195,7 @@ class DataManager:
                 lesson_list.append(lesson)
                 # print('lesson: ', lesson_list)
             except Exception as e:
-                error_message = f"Error in processing lesson {num}: {str(e)}"
+                error_message = f"Error in processing lesson: {str(e)}"
                 error_message_list.append(error_message)
             #     break
 
