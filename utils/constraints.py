@@ -1,10 +1,11 @@
 from .entities import *
-import optapy
+from optapy import config
 from optapy import constraint_provider, get_class
 from optapy.constraint import Joiners
 from optapy.score import HardSoftScore
-from optapy.types import Duration
 from loguru import logger
+
+from jpype import JPackage
 
 LessonClass = get_class(Lesson)
 RoomClass = get_class(Room)
@@ -18,9 +19,9 @@ def define_constraints(constraint_factory):
         # Hard constraints
         room_conflict(constraint_factory),
         teacher_conflict(constraint_factory),
+        teacher_availability_conflict(constraint_factory),
         student_group_conflict(constraint_factory),
         room_capacity_conflict(constraint_factory),
-        teacher_availability_conflict(constraint_factory),
         student_conflict(constraint_factory),
         room_online_offline_conflict(constraint_factory),
         # prefer_online_lessons_on_available_days(constraint_factory),
@@ -212,14 +213,32 @@ def penalize_lesson_in_forbidden_timeslot(constraint_factory):
 
 
 def get_solver_config(solving_duration):
-    solver_config = optapy.config.solver.SolverConfig().withEntityClasses(get_class(Lesson)) \
+    best_score_termination = config.solver.termination.TerminationConfig() \
+        .withBestScoreLimit("0hard/0soft")
+
+    time_spent_termination = config.solver.termination.TerminationConfig() \
+        .withSecondsSpentLimit(solving_duration)
+
+    ArrayList = JPackage("java").util.ArrayList
+    termination_list = ArrayList()
+    termination_list.add(best_score_termination)
+    termination_list.add(time_spent_termination)
+
+    composite_termination_config = config.solver.termination.TerminationConfig() \
+        .withTerminationConfigList(termination_list) \
+        .withTerminationCompositionStyle(config.solver.termination.TerminationCompositionStyle.OR)
+
+    solver_config = config.solver.SolverConfig() \
+        .withEntityClasses(get_class(Lesson)) \
         .withSolutionClass(get_class(TimeTable)) \
         .withConstraintProviderClass(get_class(define_constraints)) \
-        .withTerminationSpentLimit(Duration.ofSeconds(solving_duration)) \
+        .withTerminationConfig(composite_termination_config) \
         .withPhases([
-        optapy.config.constructionheuristic.ConstructionHeuristicPhaseConfig(),
-        optapy.config.localsearch.LocalSearchPhaseConfig()
-        .withAcceptorConfig(optapy.config.localsearch.decider.acceptor.LocalSearchAcceptorConfig()
-                            .withSimulatedAnnealingStartingTemperature("0hard/0soft"))
-    ])
+            config.constructionheuristic.ConstructionHeuristicPhaseConfig(),
+            config.localsearch.LocalSearchPhaseConfig()
+            .withAcceptorConfig(
+                config.localsearch.decider.acceptor.LocalSearchAcceptorConfig()
+                .withSimulatedAnnealingStartingTemperature("0hard/0soft")
+            )
+        ])
     return solver_config

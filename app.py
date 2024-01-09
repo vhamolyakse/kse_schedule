@@ -17,6 +17,7 @@ from collections import defaultdict
 from datetime import time
 from optapy import solver_factory_create, score_manager_create
 from loguru import logger
+from pprint import pprint
 
 from optapy import get_class
 import optapy.config
@@ -51,7 +52,7 @@ def generate_new_schedule(selected_date, solving_duration):
     explanation = score_manager.explainScore(solution)
 
     st.write(f"Final score: {str(solution.get_score())}")
-    st.write(f"Score explanation: {str(explanation)}")
+    st.write(f"Score explanation: {pprint(str(explanation))}")
 
     schedule_manager = ScheduleManager(optapy_solution=solution, start_date=selected_date)
     raw_schedule_df = schedule_manager.raw_schedule_df
