@@ -124,14 +124,14 @@ class ScheduleManager:
 
 
     def raw_schedule_to_pretty(self, raw_schedule_df):
-        raw_schedule_df['is_lection'] = np.where(self.raw_schedule_df['is_lection'] == 1,
+        raw_schedule_df['is_lection_str'] = np.where(raw_schedule_df['is_lection'] == 1,
                                                              'лекція',
                                                              'практика')
-        raw_schedule_df['is_online'] = np.where(self.raw_schedule_df['is_online'] == 1,
+        raw_schedule_df['is_online_str'] = np.where(raw_schedule_df['is_online'] == 1,
                                                  'онлайн',
                                                  'офлайн')
         raw_schedule_df['text'] = raw_schedule_df.apply(
-            lambda row: f"{row['subject']}\n{row['student_group']}\n{row['teacher']}\n{row['is_lection']}\n{row['is_online']}\n[{row['schedule_id']}]", axis=1)
+            lambda row: f"{row['subject']}\n{row['student_group']}\n{row['teacher']}\n{row['is_lection_str']}\n{row['is_online_str']}\n[{row['schedule_id']}]", axis=1)
         # print(raw_schedule_df.columns)
         # print(raw_schedule_df[['day', 'start_time', 'day_of_week', 'num_pair', 'teacher_id', 'is_lection']])
         # print(raw_schedule_df['start_time'].dtype)
