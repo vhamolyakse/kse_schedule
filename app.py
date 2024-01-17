@@ -132,7 +132,7 @@ def main():
                                        raw_schedule_df['text'].values.tolist())
 
         if st.button('Show me alternative time slots'):
-            if 'raw_schedule_df' in st.session_state and not st.session_state['raw_schedule_df'].empty:
+            if 'raw_schedule_df' in st.session_state and st.session_state['raw_schedule_df'].empty:
                 st.write("Use previously updated schedule")
                 raw_schedule_df = st.session_state['raw_schedule_df']
             st.session_state['alternatives_for_selected_lesson'] = []
@@ -227,7 +227,7 @@ def main():
             )
 
             if st.session_state['download_clicked']:
-                st.session_state['raw_schedule_df'] = []
+                st.session_state['raw_schedule_df'] = pd.DataFrame()
                 st.write('Cash cleared!')
                 st.session_state['download_clicked'] = False
 
