@@ -83,7 +83,11 @@ if 'alternatives_for_selected_lesson' not in st.session_state:
     st.session_state['alternatives_for_selected_lesson'] = []
 if 'alternatives_new_raw_schedule_df' not in st.session_state:
     st.session_state['alternatives_new_raw_schedule_df'] = []
+if 'download_clicked' not in st.session_state:
+    st.session_state['download_clicked'] = False
 
+def handle_download():
+    st.session_state['download_clicked'] = True
 
 def main():
     st.title('Schedule optimisation')
@@ -153,7 +157,7 @@ def main():
                 elapsed_time = time.time() - start_time
                 time_spent = int(elapsed_time)
                 st.write(f"Time spent: {str(time_spent)}")
-                # st.write(f"Final score: {str(solution.get_score())}")
+                st.write(f"Final score: {str(solution.get_score())}")
                 if str(solution.get_score()) != '0hard/0soft':
                     logger.debug('Solution is not good')
                     st.write(f"There is no more alternative slots")
@@ -207,8 +211,14 @@ def main():
                 label="Download updated schedules as ZIP",
                 data=zip_buffer,
                 file_name='schedules.zip',
-                mime='application/zip'
+                mime='application/zip',
+                on_click=handle_download
             )
+
+            if st.session_state['download_clicked']:
+                st.session_state['raw_schedule_df'] = []
+                st.write('Cash cleared!')
+                st.session_state['download_clicked'] = False
 
 
 if __name__ == "__main__":
