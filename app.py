@@ -115,6 +115,17 @@ def main():
         raw_schedule_df = pd.read_csv(existing_schedule_file)
 
         schedule_manager = ScheduleManager(raw_schedule_df=raw_schedule_df, start_date=selected_date)
+
+        if st.button('Get json'):
+            new_json = schedule_manager.create_json_from_df(raw_schedule_df)
+            st.download_button(
+                label="Download json",
+                data=new_json,
+                file_name='new_schedule_json.json',
+                mime='application/new_json')
+
+
+
         # import pdb
 
         selected_option = st.selectbox('Choose the lection you would like to reschedule:',
