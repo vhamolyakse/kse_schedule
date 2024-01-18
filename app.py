@@ -116,13 +116,13 @@ def main():
 
         schedule_manager = ScheduleManager(raw_schedule_df=raw_schedule_df, start_date=selected_date)
 
-        if st.button('Get json'):
-            new_json = schedule_manager.create_json_from_df(raw_schedule_df)
-            st.download_button(
-                label="Download json",
-                data=new_json,
-                file_name='new_schedule_json.json',
-                mime='application/new_json')
+
+        new_json = schedule_manager.create_json_from_df(raw_schedule_df)
+        st.download_button(
+            label="Download json",
+            data=new_json,
+            file_name='new_schedule_json.json',
+            mime='application/new_json')
 
 
 
@@ -132,7 +132,7 @@ def main():
                                        raw_schedule_df['text'].values.tolist())
 
         if st.button('Show me alternative time slots'):
-            if 'raw_schedule_df' in st.session_state and st.session_state['raw_schedule_df'].empty:
+            if 'raw_schedule_df' in st.session_state and not st.session_state['raw_schedule_df'].empty:
                 st.write("Use previously updated schedule")
                 raw_schedule_df = st.session_state['raw_schedule_df']
             st.session_state['alternatives_for_selected_lesson'] = []

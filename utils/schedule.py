@@ -43,13 +43,13 @@ class ScheduleManager:
 
     def _parse_optapy_solution(self, solution):
         day_map = {
-            'MONDAY': 1,
-            'TUESDAY': 2,
-            'WEDNESDAY': 3,
-            'THURSDAY': 4,
-            'FRIDAY': 5,
-            'SATURDAY': 6,
-            'SUNDAY': 7
+            'MONDAY': 0,
+            'TUESDAY': 1,
+            'WEDNESDAY': 2,
+            'THURSDAY': 3,
+            'FRIDAY': 4,
+            'SATURDAY': 5,
+            'SUNDAY': 6
         }
         scheduling_records_data = []
         for num, l in enumerate(solution.get_lesson_list()):
