@@ -124,10 +124,13 @@ def main():
             file_name='new_schedule_json.json',
             mime='application/new_json')
 
+        if st.button('Clear cache'):
+            st.session_state['raw_schedule_df'] = st.session_state['raw_schedule_df'] = pd.DataFrame()
 
 
         # import pdb
-
+        print('print1')
+        print(raw_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id"]])
         selected_option = st.selectbox('Choose the lection you would like to reschedule:',
                                        raw_schedule_df['text'].values.tolist())
 
@@ -138,6 +141,8 @@ def main():
             st.session_state['alternatives_for_selected_lesson'] = []
             st.session_state['alternatives_new_raw_schedule_df'] = []
 
+            print('print2')
+            print(raw_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id"]])
 
             lesson_id = int(re.search(r"\[([0-9]+)\]", selected_option).group(1))
 
@@ -146,10 +151,12 @@ def main():
             forbidden_time_slots = {selected_lesson_row['time_slot_id']: 1}
             logger.debug(f'Initial forbidden time slots: {forbidden_time_slots}')
             data_manager = DataManager(RESULT_DATA_PATH, solving_duration, existing_schedule_df=raw_schedule_df)
-
             start_time = time.time()  # Start timer
             time_spent = 0
             idx = 0
+
+            print('print3')
+            print(raw_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id"]])
 
             # for i in range(2):
             while time_spent < solving_duration:
@@ -175,7 +182,11 @@ def main():
                     break
                 else:
                     st.write(f"We have one more alternative slot")
+                print('print4')
+                print(raw_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id"]])
                 new_raw_schedule_df = ScheduleManager(optapy_solution=solution, start_date=selected_date).raw_schedule_df
+                print('print5')
+                print(new_raw_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id"]])
                 new_lesson_raw_schedule = new_raw_schedule_df[new_raw_schedule_df['lesson_id'] == lesson_id].iloc[0]
                 forbidden_time_slots.update({new_lesson_raw_schedule['time_slot_id']: 1})
                 logger.debug(f'Forbidden time slots: {forbidden_time_slots}')

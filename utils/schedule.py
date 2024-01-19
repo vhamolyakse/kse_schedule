@@ -116,7 +116,7 @@ class ScheduleManager:
         df_mapped['ID_STUD'] = df_mapped['ID_STUD'].replace({0: 2})
         df_mapped['GROUPS'] = df_mapped['GROUPS'].apply(lambda x: [x])
 
-        print(df_mapped)
+        # print(df_mapped)
         json_data = df_mapped.to_json(orient='records')
         # json_data = json.dumps(records, indent=2)
 
