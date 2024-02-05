@@ -83,12 +83,17 @@ if 'alternatives_for_selected_lesson' not in st.session_state:
     st.session_state['alternatives_for_selected_lesson'] = []
 if 'alternatives_new_raw_schedule_df' not in st.session_state:
     st.session_state['alternatives_new_raw_schedule_df'] = []
-if 'download_clicked' not in st.session_state:
-    st.session_state['download_clicked'] = False
+# if 'download_clicked' not in st.session_state:
+#     st.session_state['download_clicked'] = False
+if 'clicked' not in st.session_state:
+    st.session_state.clicked = False
 
-def handle_download():
-    st.session_state['download_clicked'] = True
 
+# def handle_download():
+#     st.session_state['download_clicked'] = True
+
+def click_button():
+    st.session_state.clicked = True
 def main():
     st.title('Schedule optimisation')
 
@@ -110,6 +115,10 @@ def main():
     existing_schedule_file = st.file_uploader("Existing raw schedule")
     print(existing_schedule_file)
 
+    if existing_schedule_file is None:
+        print("clear cache")
+        st.session_state['raw_schedule_df'] = pd.DataFrame()
+
     if existing_schedule_file is not None:
         logger.debug('Existing schedule')
         raw_schedule_df = pd.read_csv(existing_schedule_file)
@@ -117,21 +126,25 @@ def main():
         schedule_manager = ScheduleManager(raw_schedule_df=raw_schedule_df, start_date=selected_date)
 
 
-        new_json = schedule_manager.create_json_from_df(raw_schedule_df)
-        st.download_button(
-            label="Download json",
-            data=new_json,
-            file_name='new_schedule_json.json',
-            mime='application/new_json')
+        # new_json = schedule_manager.create_json_from_df(raw_schedule_df)
+        # st.download_button(
+        #     label="Download json",
+        #     data=new_json,
+        #     file_name='new_schedule_json.json',
+        #     mime='application/new_json')
 
-        if st.button('Clear cache'):
-            st.session_state['raw_schedule_df'] = st.session_state['raw_schedule_df'] = pd.DataFrame()
+        # if st.button('Clear cache'):
+        #     st.session_state['raw_schedule_df'] = pd.DataFrame()
 
+        if st.checkbox('Full availability of the Teacher'):
+            ignore_teacher_availability = True
+        else:
+            ignore_teacher_availability = False
 
         # import pdb
         print('print1')
         print(raw_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id"]])
-        selected_option = st.selectbox('Choose the lection you would like to reschedule:',
+        selected_option = st.selectbox('Choose the lesson you would like to reschedule:',
                                        raw_schedule_df['text'].values.tolist())
 
         if st.button('Show me alternative time slots'):
@@ -150,8 +163,15 @@ def main():
             selected_lesson_row = raw_schedule_df[raw_schedule_df['lesson_id'] == lesson_id].iloc[0]
             forbidden_time_slots = {selected_lesson_row['time_slot_id']: 1}
             logger.debug(f'Initial forbidden time slots: {forbidden_time_slots}')
-            data_manager = DataManager(RESULT_DATA_PATH, solving_duration, existing_schedule_df=raw_schedule_df)
-            start_time = time.time()  # Start timer
+            print('teacher:', selected_lesson_row['teacher_id'])
+            if ignore_teacher_availability:
+                available_teacher = selected_lesson_row['teacher_id']
+            else:
+                available_teacher = None
+            data_manager = DataManager(RESULT_DATA_PATH, solving_duration,
+                                       available_teacher=available_teacher,
+                                       existing_schedule_df=raw_schedule_df)
+            start_time = time.time()
             time_spent = 0
             idx = 0
 
@@ -162,7 +182,7 @@ def main():
             while time_spent < solving_duration:
                 logger.debug(f'For i : {idx} forbidden time slots: {forbidden_time_slots}')
                 problem, error_messages = data_manager.generate_optapy_problem(reschedule_lesson_id=lesson_id,
-                                                               forbidden_time_slots=forbidden_time_slots)
+                                                                               forbidden_time_slots=forbidden_time_slots)
                 if error_messages.size > 0:
                     for msg in error_messages:
                         st.error(msg)
@@ -200,6 +220,100 @@ def main():
 
                 idx += 1
 
+        # st.button('Swap lessons', on_click=click_button)
+        #
+        # if st.session_state.clicked:
+        #     selected_lesson_1 = st.selectbox('Please select the lesson you would like to swap:',
+        #                                      raw_schedule_df['text'].values.tolist())
+        #
+        #     selected_lesson_2 = st.selectbox('Please select the lesson you would like to swap with the lesson 1:',
+        #                                      raw_schedule_df['text'].values.tolist())
+        #
+        #     if st.button("Check pair and swap"):
+        #         if 'raw_schedule_df' in st.session_state and not st.session_state['raw_schedule_df'].empty:
+        #             st.write("Use previously updated schedule")
+        #             raw_schedule_df = st.session_state['raw_schedule_df']
+        #         st.session_state['alternatives_for_selected_lesson'] = []
+        #         st.session_state['alternatives_new_raw_schedule_df'] = []
+        #
+        #         print('print2')
+        #         print(raw_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id"]])
+        #
+        #         lesson_id_1 = int(re.search(r"\[([0-9]+)\]", selected_lesson_1).group(1))
+        #         lesson_id_2 = int(re.search(r"\[([0-9]+)\]", selected_lesson_2).group(1))
+        #
+        #         logger.debug(f'Selected lesson_id {lesson_id_1} swap with {lesson_id_2}')
+        #         selected_lesson_row_1 = raw_schedule_df[raw_schedule_df['lesson_id'] == lesson_id_1].iloc[0]
+        #         selected_lesson_row_2 = raw_schedule_df[raw_schedule_df['lesson_id'] == lesson_id_2].iloc[0]
+        #         selected_time_slot_id_1 = selected_lesson_row_2['time_slot_id']
+        #         forbidden_time_slots_1 = {slot_id: 1 for slot_id in range(30) if slot_id != selected_time_slot_id_1}
+        #         selected_time_slot_id_2 = selected_lesson_row_1['time_slot_id']
+        #         forbidden_time_slots_2 = {slot_id: 1 for slot_id in range(30) if slot_id != selected_time_slot_id_2}
+        #
+        #         logger.debug(f'Initial forbidden time slots for the lesson 1: {forbidden_time_slots_1}')
+        #         logger.debug(f'Initial forbidden time slots for the lesson 2: {forbidden_time_slots_2}')
+        #         if ignore_teacher_availability:
+        #             available_teacher = [selected_lesson_row_1['teacher_id']]
+        #             available_teacher += [selected_lesson_row_2['teacher_id']]
+        #
+        #         else:
+        #             available_teacher = None
+        #         data_manager = DataManager(RESULT_DATA_PATH, solving_duration,
+        #                                    available_teacher=available_teacher,
+        #                                    existing_schedule_df=raw_schedule_df)
+        #         start_time = time.time()
+        #         time_spent = 0
+        #         idx = 0
+        #
+        #         print('print3')
+        #         print(raw_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id"]])
+        #
+        #         # for i in range(2):
+        #         while time_spent < solving_duration:
+        #             logger.debug(f'For i : {idx} forbidden time slots: {forbidden_time_slots}')
+        #             problem, error_messages = data_manager.generate_optapy_problem(reschedule_lesson_id=lesson_id,
+        #                                                                            forbidden_time_slots=forbidden_time_slots)
+        #             if error_messages.size > 0:
+        #                 for msg in error_messages:
+        #                     st.error(msg)
+        #             solver_config = get_solver_config(solving_duration)
+        #             solver_factory = solver_factory_create(solver_config)
+        #             solver = solver_factory.buildSolver()
+        #             st.write(f"Going to create schedule, it will take  {solving_duration} seconds")
+        #
+        #             solution = solver.solve(problem)
+        #             elapsed_time = time.time() - start_time
+        #             time_spent = int(elapsed_time)
+        #             st.write(f"Time spent: {str(time_spent)}")
+        #             st.write(f"Final score: {str(solution.get_score())}")
+        #             if str(solution.get_score()) != '0hard/0soft':
+        #                 logger.debug('Solution is not good')
+        #                 st.write(f"There is no more alternative slots")
+        #                 break
+        #             else:
+        #                 st.write(f"We have one more alternative slot")
+        #             print('print4')
+        #             print(raw_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id"]])
+        #             new_raw_schedule_df = ScheduleManager(optapy_solution=solution,
+        #                                                   start_date=selected_date).raw_schedule_df
+        #             print('print5')
+        #             print(new_raw_schedule_df[
+        #                       ["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id"]])
+        #             new_lesson_raw_schedule = new_raw_schedule_df[new_raw_schedule_df['lesson_id'] == lesson_id].iloc[0]
+        #             forbidden_time_slots.update({new_lesson_raw_schedule['time_slot_id']: 1})
+        #             logger.debug(f'Forbidden time slots: {forbidden_time_slots}')
+        #             logger.debug(f"New time slot: {new_lesson_raw_schedule['time_slot_id']}")
+        #
+        #             st.session_state['alternatives_for_selected_lesson'].append(
+        #                 f"{new_lesson_raw_schedule['day']} {new_lesson_raw_schedule['start_time']} {new_lesson_raw_schedule['room']}"
+        #             )
+        #             st.session_state['alternatives_new_raw_schedule_df'].append(new_raw_schedule_df)
+        #             logger.debug(st.session_state['alternatives_for_selected_lesson'])
+        #
+        #             idx += 1
+
+
+
     print('UPDATED VERSIONS')
     if st.session_state['alternatives_for_selected_lesson']:
         selected_option = st.selectbox('Please choose alternative time slot:',
@@ -233,14 +347,13 @@ def main():
                 label="Download updated schedules as ZIP",
                 data=zip_buffer,
                 file_name='schedules.zip',
-                mime='application/zip',
-                on_click=handle_download
+                mime='application/zip'
             )
 
-            if st.session_state['download_clicked']:
-                st.session_state['raw_schedule_df'] = pd.DataFrame()
-                st.write('Cash cleared!')
-                st.session_state['download_clicked'] = False
+            # if st.session_state['download_clicked']:
+            #     st.session_state['raw_schedule_df'] = pd.DataFrame()
+            #     st.write('Cash cleared!')
+            #     st.session_state['download_clicked'] = False
 
 
 if __name__ == "__main__":

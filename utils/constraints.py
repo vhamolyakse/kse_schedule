@@ -10,11 +10,13 @@ from jpype import JPackage
 LessonClass = get_class(Lesson)
 RoomClass = get_class(Room)
 
+
 SOLVING_DURATION = 60
 
 
 @constraint_provider
 def define_constraints(constraint_factory):
+
     return [
         # Hard constraints
         room_conflict(constraint_factory),
@@ -35,6 +37,7 @@ def define_constraints(constraint_factory):
 
 
 def room_conflict(constraint_factory):
+    print("Constraint factory type:", type(constraint_factory))
     # A room can accommodate at most one lesson at the same time.
     return constraint_factory \
         .forEach(LessonClass) \
@@ -109,7 +112,7 @@ def room_capacity_conflict(constraint_factory):
         .penalize("Unique Room capacity conflict", HardSoftScore.ONE_HARD)
 
 
-def teacher_availability_conflict(constraint_factory):
+def teacher_availability_conflict(constraint_factory, ignore_teacher_availability=False):
     # A lesson can only be scheduled in a time slot if the teacher is available.
     return constraint_factory \
         .forEach(LessonClass) \

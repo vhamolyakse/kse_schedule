@@ -8,7 +8,7 @@ from .entities import Lesson, Room, Timeslot, TimeTable, StudentGroup, Teacher
 
 
 class DataManager:
-    def __init__(self, data_path, solving_duration, existing_schedule_df=None):
+    def __init__(self, data_path, solving_duration, available_teacher=None, existing_schedule_df=None):
         self.input_audiences_df = pd.read_csv(f'{data_path}/audiences.csv').map(strip_whitespace)
         self.input_groups_df = pd.read_csv(f'{data_path}/groups.csv').map(strip_whitespace)
         self.input_students_df = pd.read_csv(f'{data_path}/students.csv').map(strip_whitespace)
@@ -16,6 +16,8 @@ class DataManager:
         self.input_teachers_df = pd.read_csv(f'{data_path}/teachers.csv')
 
         self.solving_duration = solving_duration
+        self.available_teacher = available_teacher
+        self.available_teacher_name = None
         self.group_to_pupils = {}
         self.group_to_id = {}
         self.group_id = {}
@@ -122,7 +124,7 @@ class DataManager:
         for _, row in self.input_teachers_df.iterrows():
             teacher_name = row['name'].strip()
             online_availability = {
-                'MONDAY': str(row['monday']).strip() == 'online',  # Assuming you have columns like 'monday_online' for each day
+                'MONDAY': str(row['monday']).strip() == 'online',
                 'TUESDAY': str(row['tuesday']).strip() == 'online',
                 'WEDNESDAY': str(row['wednesday']).strip() == 'online',
                 'THURSDAY': str(row['thursday']).strip() == 'online',
@@ -137,7 +139,12 @@ class DataManager:
         self.input_teachers_df = self.input_teachers_df.replace('online ', 1).fillna(1)
         self.teachers_availability = get_teacher_availability(self.input_teachers_df, timeslot_dict)
         self.teachers_id = dict(zip(self.input_teachers_df['name'], self.input_teachers_df['id']))
-
+        if self.available_teacher is not None:
+            self.available_teacher_name = list(self.teachers_id.keys())[
+                list(self.teachers_id.values()).index(self.available_teacher)]
+            for i in range(len(self.teachers_availability[self.available_teacher_name])):
+                self.teachers_availability[self.available_teacher_name][i] = 1
+        # print("teachers_av_after:", self.teachers_availability)
     def generate_optapy_problem(self, reschedule_lesson_id=None, forbidden_time_slots=None):
         timeslot_list = get_timeslot_list()
 
@@ -176,8 +183,9 @@ class DataManager:
                                     forbidden_timeslots={int(k): int(v) for k, v in forbidden_time_slots.items()},
                                     is_fixed=False)
 
+
                 elif row['id'] in self.existing_schedule_records:
-                    print('in existing_schedule_records', num)
+                    # print('in existing_schedule_records', num)
                     ideal_time_slot_id = self.existing_schedule_records[row['id']]['time_slot_id']
                     ideal_room_id = self.existing_schedule_records[row['id']]['room_id']
                     lesson = Lesson(row['id'], row['kse_id'], row['subject'],
@@ -198,6 +206,7 @@ class DataManager:
                 error_message = f"Error in processing lesson: {str(e)}"
                 error_message_list.append(error_message)
             #     break
+
 
         lesson = lesson_list[0]
         lesson.is_pinned = True
