@@ -16,7 +16,7 @@ class DataManager:
         self.input_teachers_df = pd.read_csv(f'{data_path}/teachers.csv')
 
         self.solving_duration = solving_duration
-        self.available_teacher = available_teacher
+        self.available_teachers = available_teacher
         self.available_teacher_name = None
         self.group_to_pupils = {}
         self.group_to_id = {}
@@ -139,11 +139,12 @@ class DataManager:
         self.input_teachers_df = self.input_teachers_df.replace('online ', 1).fillna(1)
         self.teachers_availability = get_teacher_availability(self.input_teachers_df, timeslot_dict)
         self.teachers_id = dict(zip(self.input_teachers_df['name'], self.input_teachers_df['id']))
-        if self.available_teacher is not None:
-            self.available_teacher_name = list(self.teachers_id.keys())[
-                list(self.teachers_id.values()).index(self.available_teacher)]
-            for i in range(len(self.teachers_availability[self.available_teacher_name])):
-                self.teachers_availability[self.available_teacher_name][i] = 1
+        if self.available_teachers is not None:
+            for available_teacher in self.available_teachers:
+                self.available_teacher_name = list(self.teachers_id.keys())[
+                    list(self.teachers_id.values()).index(available_teacher)]
+                for i in range(len(self.teachers_availability[self.available_teacher_name])):
+                    self.teachers_availability[self.available_teacher_name][i] = 1
         # print("teachers_av_after:", self.teachers_availability)
     def generate_optapy_problem(self, reschedule_lesson_id=None, forbidden_time_slots=None):
         timeslot_list = get_timeslot_list()
