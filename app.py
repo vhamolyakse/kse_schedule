@@ -9,7 +9,7 @@ from optapy import solver_factory_create, score_manager_create
 from utils.preprocessing import strip_whitespace, get_group_intersections
 from utils.entities import StudentGroup, Teacher, Room, Timeslot, Lesson, TimeTable
 from utils.time_utils import get_teacher_availability, get_timeslot_list
-from utils.constraints import define_constraints, get_solver_config, SOLVING_DURATION
+# from utils.constraints import define_constraints, get_solver_config, SOLVING_DURATION
 from utils.files import process_file, convert_df_to_csv
 from utils.data import DataManager
 from utils.schedule import ScheduleManager
@@ -18,7 +18,7 @@ from datetime import time
 from optapy import solver_factory_create, score_manager_create
 from loguru import logger
 import time
-from utils.check_constraints import check_constraints
+# from utils.check_constraints import check_constraints
 
 from optapy import get_class
 import optapy.config
