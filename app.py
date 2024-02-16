@@ -37,6 +37,41 @@ from optapy.score import HardSoftScore
 RESULT_DATA_PATH = 'new_schedule/input'
 
 
+def parse_score_explanation(explanation_text):
+    constraint_pattern = re.compile(r'(-\d+\w+): constraint \((.*?)\) has (\d+) matches:', re.DOTALL)
+    indicted_object_pattern = re.compile(r'(-\d+\w+): indicted object \((.*?)\) has (\d+) matches:', re.DOTALL)
+
+    constraints_match = constraint_pattern.findall(explanation_text)
+    constraint_details = []
+    for constraint_score, constraint, match_count in constraints_match:
+        constraints_data = {
+            "Score": constraint_score,
+            "Constraint": constraint.strip(),
+            "Match Count": match_count
+        }
+        constraint_details.append(constraints_data)
+
+    indicted_object_match = indicted_object_pattern.findall(explanation_text)
+    indicted_object_details = []
+    for indicted_score, indicted_object, match_count in indicted_object_match:
+        indicted_object_details.append((indicted_score.strip(), indicted_object.strip(), match_count))
+
+    return constraint_details, indicted_object_details
+
+
+def display_score_explanation(constraint_details, indicted_object_details):
+    st.write("Constraint Details:")
+    for constraint in constraint_details:
+        st.write(f"Score: {constraint['Score']} \n Constraint: {constraint['Constraint']} \n Match Count: {constraint['Match Count']}")
+        # st.write(f"Constraint: {constraint['Constraint']}")
+        # st.write(f"Match Count: {constraint['Match Count']}")
+
+    st.write("Indicted Object Details:")
+    for indicted_object in indicted_object_details:
+        st.write(f"Score: {indicted_object[0]}")
+        st.write(f"Constraint: {indicted_object[1]}")
+
+
 def generate_new_schedule(selected_date, solving_duration):
     data_manager = DataManager(RESULT_DATA_PATH, solving_duration)
     problem, error_messages = data_manager.generate_optapy_problem()
@@ -51,9 +86,12 @@ def generate_new_schedule(selected_date, solving_duration):
     solution = solver.solve(problem)
     score_manager = score_manager_create(solver_factory)
     explanation = score_manager.explainScore(solution)
+    explanations = str(explanation)
+    constraint_details, indicted_object_details = parse_score_explanation(explanations)
 
     st.write(f"Final score: {str(solution.get_score())}")
-    st.write(f"Score explanation: {str(explanation)}")
+    display_score_explanation(constraint_details, indicted_object_details)
+    # st.write(f"Score explanation: {str(explanation)}")
 
     schedule_manager = ScheduleManager(optapy_solution=solution, start_date=selected_date)
     raw_schedule_df = schedule_manager.raw_schedule_df
@@ -162,7 +200,7 @@ def main():
 
         # import pdb
         # print('print1')
-        # print(raw_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id"]])
+        # print(raw_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id", "room"]])
         selected_option = st.selectbox('Choose the lesson you would like to reschedule:',
                                        raw_schedule_df['text'].values.tolist())
 
@@ -182,7 +220,7 @@ def main():
             selected_lesson_row = raw_schedule_df[raw_schedule_df['lesson_id'] == lesson_id].iloc[0]
             forbidden_time_slots = {selected_lesson_row['time_slot_id']: 1}
             logger.debug(f'Initial forbidden time slots: {forbidden_time_slots}')
-            print('teacher:', selected_lesson_row['teacher_id'])
+            # print('teacher:', selected_lesson_row['teacher_id'])
             if ignore_teacher_availability:
                 available_teacher = [selected_lesson_row['teacher_id']]
             else:
@@ -288,18 +326,20 @@ def main():
                                          raw_schedule_df['text'].values.tolist())
 
         if st.button("Check pair and swap"):
+            st.write(f"Going to swap lessons, it will take  {solving_duration} seconds")
             if 'raw_schedule_df' in st.session_state and not st.session_state['raw_schedule_df'].empty:
                 st.write("Use previously updated schedule")
                 raw_schedule_df = st.session_state['raw_schedule_df'].copy()
             st.session_state['new_swapped_raw_schedule_df'] = None
-            # print('print swap')
-            # print(raw_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id"]])
 
             lesson_id_1 = int(re.search(r"\[([0-9]+)\]", selected_lesson_1).group(1))
             lesson_id_2 = int(re.search(r"\[([0-9]+)\]", selected_lesson_2).group(1))
 
             swapped_schedule_df = raw_schedule_df.copy()
             swapped_schedule_df = swap_lessons_in_df(lesson_id_1, lesson_id_2, swapped_schedule_df)
+
+            # print('print swap')
+            print(swapped_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id", "room"]])
 
             selected_lesson1_row = raw_schedule_df[raw_schedule_df['lesson_id'] == lesson_id_1].iloc[0]
             selected_lesson2_row = raw_schedule_df[raw_schedule_df['lesson_id'] == lesson_id_2].iloc[0]
@@ -311,7 +351,7 @@ def main():
                 available_teacher = None
 
             # print('print swap2')
-            # print(raw_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id"]])
+            # print(raw_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id", "room"]])
 
             data_manager = DataManager(RESULT_DATA_PATH, solving_duration=solving_duration,
                                        available_teacher=available_teacher,
@@ -321,9 +361,16 @@ def main():
             solver_config = get_solver_config(solving_duration)
             solver_factory = solver_factory_create(solver_config)
             solver = solver_factory.buildSolver()
+            score_manager = score_manager_create(solver_factory)
             solution = solver.solve(problem)
+            explanation = score_manager.explainScore(solution)
+            explanations = str(explanation)
+            constraint_details, indicted_object_details = parse_score_explanation(explanations)
+            # formatted_explanation = display_score_explanation(constraint_details, indicted_object_details)
 
             st.write(f"Final score: {str(solution.get_score())}")
+            display_score_explanation(constraint_details, indicted_object_details)
+            # st.write(f"Score explanation:\n{formatted_explanation}")
 
             if str(solution.get_score()) == '0hard/0soft':
                 st.session_state['new_swapped_raw_schedule_df'] = swapped_schedule_df.copy()

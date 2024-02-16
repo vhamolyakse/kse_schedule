@@ -189,6 +189,7 @@ class DataManager:
                     # print('in existing_schedule_records', num)
                     ideal_time_slot_id = self.existing_schedule_records[row['id']]['time_slot_id']
                     ideal_room_id = self.existing_schedule_records[row['id']]['room_id']
+                    # print(row['id'], ideal_room_id)
                     lesson = Lesson(row['id'], row['kse_id'], row['subject'],
                                     Teacher(row['teacher'], self.teacher_online_availability[row['teacher']], self.teachers_availability[row['teacher']]), teacher_id,
                                     row['is_lection'], group, students_df.shape[0],
