@@ -137,6 +137,7 @@ class DataManager:
                     self.teacher_online_availability[teacher_name][num] = 1 if online_availability[day] else 0
                     num += 1
         self.input_teachers_df = self.input_teachers_df.replace('online ', 1).fillna(1)
+
         self.teachers_availability = get_teacher_availability(self.input_teachers_df, timeslot_dict)
         self.teachers_id = dict(zip(self.input_teachers_df['name'], self.input_teachers_df['id']))
         if self.available_teachers is not None:

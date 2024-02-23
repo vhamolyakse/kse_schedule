@@ -141,7 +141,7 @@ def swap_lessons_in_df(lesson_1_id, lesson_2_id, df):
     lesson_1_row = df[df['lesson_id'] == lesson_1_id]
     lesson_2_row = df[df['lesson_id'] == lesson_2_id]
 
-    columns_to_swap = ['day', 'day_of_week', 'lesson_date', 'start_time', 'num_pair', 'time_slot_id']
+    columns_to_swap = ['room', 'day', 'day_of_week', 'lesson_date', 'start_time', 'num_pair', 'room_id', 'auditory_id', 'time_slot_id']
 
     for col in columns_to_swap:
         temp = lesson_1_row[col].values[0]
@@ -370,6 +370,7 @@ def main():
 
             st.write(f"Final score: {str(solution.get_score())}")
             display_score_explanation(constraint_details, indicted_object_details)
+            print(explanations)
             # st.write(f"Score explanation:\n{formatted_explanation}")
 
             if str(solution.get_score()) == '0hard/0soft':
@@ -408,7 +409,7 @@ def main():
             # print(raw_schedule_df[["teacher", "day", "day_of_week", "lesson_date", "start_time", "lesson_id"]])
 
     if st.session_state['new_swapped_raw_schedule_df'] is not None:
-        if st.button('Update schedule'):
+        if st.button('Update swapped schedule'):
             new_swapped_raw_schedule_df = st.session_state['new_swapped_raw_schedule_df'].copy()
             st.session_state['raw_schedule_df'] = new_swapped_raw_schedule_df.copy()
             # import pdb
