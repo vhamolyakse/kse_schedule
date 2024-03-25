@@ -81,7 +81,7 @@ class Timeslot:
 
 @planning_entity
 class Lesson:
-    def __init__(self, id, lesson_id, subject, teacher, teacher_id, is_lection, student_group, student_group_capacity, is_online, group_intersection, timeslot=None, room=None, ideal_timeslot_id=None, ideal_room_id=None, forbidden_timeslots=None, is_fixed=False):
+    def __init__(self, id, lesson_id, subject, teacher, teacher_id, is_lection, is_in_a_row, is_not_in_one_day, student_group, student_group_capacity, is_online, group_intersection, timeslot=None, room=None, ideal_timeslot_id=None, ideal_room_id=None, forbidden_timeslots=None, is_fixed=False):
         self.id = id
         self.lesson_id = lesson_id
         self.subject = subject
@@ -89,6 +89,8 @@ class Lesson:
         self.teacher = teacher
         self.teacher_id = teacher_id
         self.is_lection = is_lection
+        self.is_in_a_row = is_in_a_row
+        self.is_not_in_one_day = is_not_in_one_day
         self.student_group = student_group
         self.student_group_capacity = student_group_capacity
         self.timeslot = timeslot

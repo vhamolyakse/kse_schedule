@@ -10,13 +10,11 @@ from jpype import JPackage
 LessonClass = get_class(Lesson)
 RoomClass = get_class(Room)
 
-
 SOLVING_DURATION = 60
 
 
 @constraint_provider
 def define_constraints(constraint_factory):
-
     return [
         # Hard constraints
         room_conflict(constraint_factory),
@@ -28,6 +26,8 @@ def define_constraints(constraint_factory):
         room_online_offline_conflict(constraint_factory),
         # prefer_online_lessons_on_available_days(constraint_factory),
         lecture_order_conflict(constraint_factory),
+        lessons_in_a_row_conflict(constraint_factory),
+        lessons_in_different_days_conflict(constraint_factory),
         penalize_lesson_not_in_ideal_timeslot(constraint_factory),
         penalize_lesson_not_in_ideal_room(constraint_factory),
         penalize_lesson_in_forbidden_timeslot(constraint_factory)
@@ -172,6 +172,48 @@ def lecture_order_conflict(constraint_factory):
                 lesson.timeslot.id >= other_lesson.timeslot.id) \
         .penalize("LectureBeforePracticeConflict", HardSoftScore.ONE_HARD)
 
+
+def lessons_in_a_row_conflict(constraint_factory):
+    return constraint_factory \
+        .forEach(Lesson) \
+        .join(Lesson,
+              [
+                  # Join condition: for lessons with similar characteristics
+                  Joiners.equal(lambda lesson: lesson.subject),
+                  Joiners.equal(lambda lesson: lesson.teacher.name),
+                  Joiners.equal(lambda lesson: lesson.student_group),
+                  Joiners.equal(lambda lesson: lesson.is_lection),
+                  Joiners.equal(lambda lesson: lesson.is_online),
+                  Joiners.filtering(lambda lessonA, lessonB:
+                                    (lessonA.id != lessonB.id and
+                                    lessonA.is_in_a_row == 1 and
+                                    lessonA.timeslot.id < lessonB.timeslot.id and
+                                    abs(lessonA.timeslot.id - lessonB.timeslot.id) > 1) or
+                                    (lessonA.id != lessonB.id and
+                                    lessonA.is_in_a_row == 1 and
+                                    lessonA.timeslot.day_of_week != lessonB.timeslot.day_of_week))  # Not consecutive
+
+              ]) \
+        .penalize("Lessons not in a row", HardSoftScore.ONE_HARD)
+
+def lessons_in_different_days_conflict(constraint_factory):
+    return constraint_factory \
+        .forEach(Lesson) \
+        .join(Lesson,
+              [
+                  # Join condition: for lessons with similar characteristics
+                  Joiners.equal(lambda lesson: lesson.subject),
+                  Joiners.equal(lambda lesson: lesson.teacher.name),
+                  Joiners.equal(lambda lesson: lesson.student_group),
+                  Joiners.equal(lambda lesson: lesson.is_lection),
+                  Joiners.equal(lambda lesson: lesson.is_online),
+                  Joiners.filtering(lambda lessonA, lessonB:
+                                    lessonA.id != lessonB.id and
+                                    lessonA.is_not_in_one_day == 1 and
+                                    lessonA.timeslot.day_of_week == lessonB.timeslot.day_of_week)  # Same day
+              ]) \
+        .penalize("Lessons on the same day", HardSoftScore.ONE_HARD)
+
     # def prefer_online_lessons_on_available_days(constraint_factory):
 
 
@@ -237,11 +279,11 @@ def get_solver_config(solving_duration):
         .withConstraintProviderClass(get_class(define_constraints)) \
         .withTerminationConfig(composite_termination_config) \
         .withPhases([
-            config.constructionheuristic.ConstructionHeuristicPhaseConfig(),
-            config.localsearch.LocalSearchPhaseConfig()
-            .withAcceptorConfig(
-                config.localsearch.decider.acceptor.LocalSearchAcceptorConfig()
-                .withSimulatedAnnealingStartingTemperature("0hard/0soft")
-            )
-        ])
+        config.constructionheuristic.ConstructionHeuristicPhaseConfig(),
+        config.localsearch.LocalSearchPhaseConfig()
+        .withAcceptorConfig(
+            config.localsearch.decider.acceptor.LocalSearchAcceptorConfig()
+            .withSimulatedAnnealingStartingTemperature("0hard/0soft")
+        )
+    ])
     return solver_config

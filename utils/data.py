@@ -86,7 +86,6 @@ class DataManager:
         # print(self.group_to_pupils)
 
     def _preprocess_lessons(self):
-        # TODO: add support of online lections
         # self.input_lessons_df = self.input_lessons_df[self.input_lessons_df['format'] == 'офлайн']
         self.input_lessons_df['is_online'] = np.where(self.input_lessons_df['format'] == 'офлайн', 0, 1)
         # print(sum(self.input_audiences_df['is_online']))
@@ -180,11 +179,10 @@ class DataManager:
                     print('reschedule_lesson_id', reschedule_lesson_id)
                     lesson = Lesson(row['id'], row['kse_id'], row['subject'],
                                     Teacher(row['teacher'], self.teacher_online_availability[row['teacher']], self.teachers_availability[row['teacher']]), teacher_id,
-                                    row['is_lection'], group, students_df.shape[0],
+                                    row['is_lection'], row['is_in_a_row'], row['is_not_in_one_day'], group, students_df.shape[0],
                                     row['is_online'], group_intersection=self.group_intersection,
                                     forbidden_timeslots={int(k): int(v) for k, v in forbidden_time_slots.items()},
                                     is_fixed=False)
-
 
                 elif row['id'] in self.existing_schedule_records:
                     # print('in existing_schedule_records', num)
@@ -193,14 +191,14 @@ class DataManager:
                     # print(row['id'], ideal_room_id)
                     lesson = Lesson(row['id'], row['kse_id'], row['subject'],
                                     Teacher(row['teacher'], self.teacher_online_availability[row['teacher']], self.teachers_availability[row['teacher']]), teacher_id,
-                                    row['is_lection'], group, students_df.shape[0],
+                                    row['is_lection'], row['is_in_a_row'], row['is_not_in_one_day'], group, students_df.shape[0],
                                     row['is_online'], group_intersection=self.group_intersection,
                                     ideal_room_id=ideal_room_id, ideal_timeslot_id=ideal_time_slot_id, is_fixed=True)
 
                 else:
                     lesson = Lesson(row['id'], row['kse_id'], row['subject'],
                                     Teacher(row['teacher'], self.teacher_online_availability[row['teacher']], self.teachers_availability[row['teacher']]), teacher_id,
-                                    row['is_lection'], group, students_df.shape[0], row['is_online'],
+                                    row['is_lection'], row['is_in_a_row'], row['is_not_in_one_day'], group, students_df.shape[0], row['is_online'],
                                     group_intersection=self.group_intersection)
                 # print('lesson: ', lesson)
                 lesson_list.append(lesson)
@@ -209,7 +207,6 @@ class DataManager:
                 error_message = f"Error in processing lesson: {str(e)}"
                 error_message_list.append(error_message)
             #     break
-
 
         lesson = lesson_list[0]
         lesson.is_pinned = True
